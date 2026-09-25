@@ -25,7 +25,8 @@
 #define fmul fixmul    // glibc 2.28+/2.35+ define float fmul/fsqrt; want Allegro 3 fixed-point
 #define fsqrt fixsqrt
 
-/* Linux port: scaled borderless fullscreen, see gfscale.c */
+/* Port: platform glue (window, exe dir, panic exit), see gfscale.c */
+void gf_platform_init(void);
 int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h);
 int gf_mouse_x(void);
 int gf_mouse_y(void);

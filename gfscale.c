@@ -7,17 +7,80 @@
  *       window, and the window manager is asked to fullscreen that window.
  *
  *    Opt-in with GF_SCALE=1 (experimental); default is a plain 640x480 window.
+ *    Windows: always a plain 640x480 window.
+ *
+ *    Also: run from the exe's directory, and the panic exit (Ctrl+C or the
+ *    window's close button kills the game at once).
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <allegro.h>
+#ifdef _WIN32
+#include <winalleg.h>
+#include <direct.h>
+#else
+#include <unistd.h>
+#include <limits.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/extensions/Xrandr.h>
+#endif
 
 #undef set_gfx_mode   /* gfhead.h routes the game's calls here */
+
+/* Data paths are relative ("./dat/"): run from the exe's directory.
+   Windows has no console, so stdout/stderr go to gf.log there. */
+void gf_platform_init(void)
+{
+  char exe[4096], *s;
+#ifdef _WIN32
+  DWORD n = GetModuleFileNameA(NULL, exe, sizeof(exe));
+  if (n > 0 && n < sizeof(exe) && (s = strrchr(exe, '\\'))) { *s = 0; _chdir(exe); }
+  fclose(fopen("gf.log", "w"));
+  freopen("gf.log", "a", stdout); setvbuf(stdout, NULL, _IONBF, 0);
+  freopen("gf.log", "a", stderr); setvbuf(stderr, NULL, _IONBF, 0);
+#else
+  ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe)-1);
+  if (n > 0) { exe[n] = 0; if ((s = strrchr(exe, '/'))) *s = 0; if (chdir(exe)) perror("chdir"); }
+#endif
+}
+
+/* Panic exit. Nothing to undo (the monitor's mode is never changed);
+   settings changed since the game started are not saved. */
+static void panic(void)
+{
+#ifdef _WIN32
+  TerminateProcess(GetCurrentProcess(), 1);
+#else
+  _exit(1);
+#endif
+}
+
+static void panic_key(int scancode)
+{
+  if (scancode == KEY_C && (key[KEY_LCONTROL] || key[KEY_RCONTROL])) panic();
+}
+
+static int with_panic(int ret)
+{
+  keyboard_lowlevel_callback = panic_key;
+  set_close_button_callback(panic);
+  return ret;
+}
+
+#ifdef _WIN32
+
+int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h)
+{
+  return with_panic(set_gfx_mode(card == GFX_TEXT ? card : GFX_AUTODETECT_WINDOWED, w, h, v_w, v_h));
+}
+
+int gf_mouse_x(void) { return mouse_x; }
+int gf_mouse_y(void) { return mouse_y; }
+
+#else
 
 static BITMAP *real_screen = NULL;   /* NULL = not scaling */
 static int ox, oy, dw, dh;           /* letterbox rectangle inside real_screen */
@@ -120,7 +183,7 @@ static void go_fullscreen(Display *d, int mx, int my)
   XFlush(d);
 }
 
-int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h)
+static int scale_mode(int card, int w, int h, int v_w, int v_h)
 {
   Display *d;
   BITMAP *buf;
@@ -166,3 +229,10 @@ int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h)
 /* Real-window mouse position -> 640x480 game coordinates. */
 int gf_mouse_x(void) { return real_screen ? (mouse_x - ox) * screen->w / dw : mouse_x; }
 int gf_mouse_y(void) { return real_screen ? (mouse_y - oy) * screen->h / dh : mouse_y; }
+
+int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h)
+{
+  return with_panic(scale_mode(card, w, h, v_w, v_h));
+}
+
+#endif

@@ -25,6 +25,8 @@ This file has two parts:
   - clicking an option's left or right half steps it down or up, like the arrow keys;
   - the Pixel amount and Sound Volume bars can be clicked or dragged.
 - Menu music, played through libxmp.
+- Windows build (`make -f Makefile.mingw`): a single `gf.exe`, always windowed. Messages go to `gf.log`.
+- Emergency exit: Ctrl+C or the window's close button ends the game at once.
 - Experimental scaled borderless fullscreen with `GF_SCALE=1`. Known bug: the screen can go blank after a keypress.
 
 ### Changed

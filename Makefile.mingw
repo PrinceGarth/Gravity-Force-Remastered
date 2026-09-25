@@ -1,0 +1,14 @@
+# Windows cross-build: make -f Makefile.mingw CC=<mingw gcc/clang> WIN=<prefix with static Allegro 4.4 + libxmp>
+# Output: one gf.exe with no DLL dependencies beyond Windows' own.
+include Makefile.linux
+.DEFAULT_GOAL := gf.exe
+CC = x86_64-w64-mingw32-gcc
+WIN = win
+CFLAGS = -O2 -w -fcommon -Istubs -I$(WIN)/include -DALLEGRO_STATICLINK
+LIBS = -L$(WIN)/lib -lalleg -lxmp -ldinput -lddraw -ldxguid -ldsound -lwinmm -lole32 -lgdi32 -lcomdlg32 -luser32 -lkernel32 -lpthread
+
+gf.exe: $(SRCS:.c=.win.o)
+	$(CC) $^ -static -mwindows $(LIBS) -o $@
+
+%.win.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
