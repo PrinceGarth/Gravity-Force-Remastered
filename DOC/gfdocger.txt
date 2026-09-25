@@ -1,0 +1,413 @@
+...........................................................................
+========================> Gravity Force, v1.02 <===========================
+
+
+1.  Einfuehrung
+2.  Uebersicht
+3.  Systemanforderungen
+4.  Steuerung
+5.  Sonstige Infos
+6.  Versionsuebersicht
+7.  Download
+8.  Rechtliches
+9.  Background
+10. Credits
+
+
+1. EINFUEHRUNG
+
+Vor etwa zehn Jahren kaufte ich mir einen Amiga 500. Das erste Spiel,
+das ich damals spielte, war Maniac Mansion. Das zweite Spiel war Gravity
+Force. Dieses Spiel hatte einen dermassen hohen "Suchtfaktor", dass ich
+es sogar nach fuenf Jahren noch gerne spielte. Ich habe mir immer gesagt,
+dass es ein Spiel mit diesem Konzept sein wuerde, das ich einmal selbst
+erstelle. Ich denke, dass ich nun soweit bin, obwohl es mein erstes
+wirklich abgeschlossenes Spiel sein wird.
+
+
+2. UEBERSICHT
+
+In Gravity Force steuert man ein kleines Schiff. Ihre Mission ist es meist,
+alle herumliegenden Warenpakete aufzusammeln und diese sicher zur Heimat-
+basis zurueckzubringen. Das waere eigentlich einfach, wenn da die Gegner
+und die Gravitation nicht waeren. Fuer die Gegner haben Sie Waffen (6 ver-
+schiedene Systeme) und fuer die Gravitation Ihr Geschick (vielleicht) :-)
+
+Mein Ziel bei der Entwicklung war nicht nur die blosse Adaption eines 
+genialen Klassikers, sondern auch das Einbringen neuer Features wie 
+verschiedener Missionstypen, die in allen (?) originalen "Thrust"-Clones 
+nicht enthalten sind.
+
+So muessen Sie ausser dem "Fracht auflesen" in diversen Varianten auch 
+Schiffe eskortieren oder Search-and-Destroy-Einsaetze fliegen. Ich habe
+sehr darauf geachtet, in jeden Level wieder etwas neues zu integrieren,
+um den "Baeh, schon wieder das gleiche..."-Effekt zu vermindern. Wenn Sie
+einen Level partout nicht schaffen (z.B. Level 8), dann schreiben Sie mir
+einfach und ich schicke Ihnen die gewuenschten Passwoerter zu.
+
+Ab Version 1.0 ist auch der Einspieler-"Race"-Modus implementiert, vorerst
+mit nur drei Karten. Multiplayer gibt es in dieser Version auch, allerdings
+nur auf einem Bildschirm an einem Computer ("Arena-Dogfight"). Netzwerk-
+support kommt evtl. spaeter.
+
+
+3. SYSTEMANFORDERUNGEN
+
+Gravity Force wurde auf einem Intel Pentium 200 mit 64 MB RAM programmiert.
+Das Spiel selbst benoetigt etwa 8 MB RAM und laeuft recht gut unter reinem
+DOS und auch in einer DOS-Box unter Windows 95/98. Seit v0.6 sollte es so-
+gar ab einem Pentium 133 relativ ruckelfrei laufen (je nach Level). Je
+schneller desto besser.
+
+Die DOS-Version laeuft nicht unter Win NT oder 2000.
+Die Windows-Version sollte dort theoretisch laufen, sofern DirectX 7 
+installiert ist. Allerdings lege ich fuer die (meiner Ansicht nach viel
+zu holprige) Windows-Version keine Hand oder gar sonstwas ins Feuer.
+
+
+4. STEUERUNG
+
+Die meisten Tasten lassen sich in den Spieloptionen sowohl fuer den Ein-
+als auch den Zweispielermodus getrennt veraendern. Dort kann auch Joystick-
+steuerung konfiguriert werden.
+
+Standardmaessig sind folgende Tasten eingestellt:
+
+Leertaste    --  Triebwerk zuenden
+Pfeil links  --  Links drehen
+Pfeil rechts --  Rechts drehen
+Pfeil oben   --  Gewaehlte Waffe feuern
+
+1            --  Standardwaffe auswaehlen
+2            --  Doppelschuss-Waffe auswaehlen
+3            --  Ballistische Bomben auswaehlen
+4            --  Megabomb auswaehlen
+5            --  Lenkraketen auswaehlen
+6            --  Minen auswaehlen
+
+Enter        --  Spezial / Alle Minen zuenden 
+
+
+Die folgenden Tasten lassen sich momentan noch nicht veraendern:
+
+P            --  Infopanels ein-/ausblenden (Vollbildspiel)
+R            --  Zoom von Radarfenster einstellen (1x-5x)
+
+Pause        --  Pause :-)
+F12          --  Screenshot erstellen
+ESC          --  Spiel abbrechen, zurueck zum Menue
+Shift+ESC    --  (im Menue) Spiel sofort verlassen
+
+Bild auf/ab  --  Den dargestellten Scorecode veraendern (Menue)
+
+
+> WICHTIGER Hinweis
+-------------------
+Im Dogfight-Modus kann es zu Eingabeproblemen kommen, wenn beide Spieler
+die Tastatur benutzen und vier oder mehr Tasten gleichzeitig betaetigt
+werden. Dieses Problem kann von Tastatur zu Tastatur variieren (d.h. bei
+manchen ist es schlimmer als bei anderen). 
+
+Das ist ein Hardwareproblem und kann nicht ohne weiteres geloest werden.
+Meine Empfehlung ist, dass ein Spieler einen Joystick oder (besser) ein
+Gamepad benutzt. Dann gibt es keine Probleme.
+
+
+
+5. SONSTIGE INFORMATIONEN
+
+ -- Optionsmenue: Der Wert "Anzahl Pixel" gibt an, wieviele Pixeleffekte
+    dargestellt werden. Wenn Sie einen etwas schwachbruestigen Computer
+    haben, verringern Sie diesen Parameter und erhoehen Sie ihn, wenn Sie
+    einen schnelleren Rechner haben oder einfach diese Effekte moegen.
+    (0% bedeutet keinerlei Pixel, 200% bedeutet doppelt so viele Pixel wie
+    "normal").
+
+ -- Optionsmenue: Aktivieren Sie "Pixelablenkung" nur, wenn Sie einen sehr
+    schnellen Rechner haben! ("schnell": >= Pentium II)
+    In der Tat macht der Schalter auch nicht viel. Ist er aktiviert, werden
+    die umhertreibenden Pixel in Leveln, in denen es die "Gravitations-
+    waende" gibt, von diesen abgelenkt. Wenn viele Pixel gleichzeitig auf
+    dem Bildschirm sind und solche Geraete an den Waenden haengen, kann
+    das Spiel auf langsameren Rechnern sogar fuer mehrere Sekunden ein-
+    schlafen.
+    
+ -- Punktesystem: Ihre Punkte werden durch einen "Zeitmultiplikator" ver-
+    ringert, der fuer jeden Level unterschiedlich sein kann. Dieser Wert
+    ist 0.01-0.03 in den meisten Levels. Wenn Sie 100 Sekunden benoetigen, 
+    um eine Mission abzuschliessen, werden Ihnen 100 * (100*0.03) = 300 
+    Punkte abgezogen.
+
+    Tip: Wenn Sie alle Gegner in einem Level zerstoeren, erhalten Sie einen
+    Bonus von 1000 Punkten (dabei ist es oft nicht noetig, alle Gegner zu 
+    zerstoeren, z.B. muss man die grossen Roten nicht toeten, um den Bonus
+    zu bekommen). Und wenn Sie kein Leben verlieren, erhalten Sie 
+    700 Punkte zusaetzlich.
+
+ -- Gegner: Sie muessen die "dicken Roten" nicht zerstoeren. Es gibt immer
+    einen Weg, an ihnen vorbeizukommen. 
+    
+ -- "Internet Highscore Code": Wenn Sie in die Highscore gelangen, erhalten
+    Sie einen Code. Schreiben Sie diesen auf und besuchen Sie die Gravity
+    Force-Homepage (www.skytrek.de/gf/ger/gf.html). Klicken Sie dort auf
+    "Hiscores" und fuellen Sie das dortige Formular aus. Ihren Namen, den
+    Sie dort angeben, muss EXAKT derselbe sein, den Sie auch im Spiel be-
+    nutzt haben. Klicken Sie dann auf "Update!"; Wenn Sie gut genug waren,
+    wird Ihr Punktestand in die entsprechende Tabelle eingetragen.
+
+    Seit v0.7 koennen Sie die hiscore.dat auch aus dem Internet herunter-
+    laden. 
+
+ -- Dogfight: 
+
+    Extras-Einstellung: Keine  --  Keine Extras
+                        Wenig  --  Ca. jeder 4. Abschuss ergibt ein Extra
+                        Mittel --  Ca. jeder 2. Abschuss ergibt ein Extra
+                        Viel   --  Jeder Abschuss ergibt ein Extra
+                            
+ -- Bugs: In der momentanen Version (1.0) sollten alle grossen Bugs ausge-
+    merzt sein. Falls das Spiel dennoch bei Ihnen abstuerzen sollte, so 
+    schicken Sie mir bitte schnellstens eine Mail mit den genauen Um-
+    staenden des Absturzes (OS, Computer, ...)! Danke.
+
+    Das Spiel ist mit v1.0 leider nicht mehr kompatibel zu den alten 
+    hiscore.dat Files vorhergehender Versionen. 
+                                    
+
+    
+6. VERSIONSUEBERSICHT
+
+v1.02 (24/09/00)
+ + Vollstaendige Uebersetzung ins Slovakische (von Juraj Michalek)
+
+v1.01 (02/09/00)
+ * Bugfix: Fehler bei Berechnung der Treffergenauigkeit haupts. in Level 10
+ + Mit Shift+ESC kann man das Spiel im Menue sofort beenden
+
+v1.0 (26/08/00)
+ ! Erste veroeffentlichte Version nach v0.9b
+ + Keine Doppelbelegung von Tasten mehr moeglich
+ + Alle unten aufgefuehrten Punkte seit v0.9c
+
+v0.9j (18/08/00)
+ + Alle Files aus /MAP- und /LNG-Verzeichnissen nun in zwei Datafiles
+ + Texte verschwinden nun meistens beim Abheben von einer Basis
+ + Menue: ESC-Taste nun aequivalent zu "Zurueck"-Button
+ * Bugfixes
+
+v0.9i (14/08/00)
+ + Dogfight: Einstellungen fuer Waffen- und Extras-Anzahl
+ + Race: Start & Ziel nun identisch
+ + Dritte Race-Karte
+ * Einige Bugfixes
+
+v0.9h (09/08/00)
+ ! erste Vorversion fuer Betatester 
+ + leicht intelligentere Raketen
+ + leicht intelligentere Sonden
+ + Windows-Version compiliert
+
+v0.9g (08/08/00)
+ + Level 10 ("Pazifismus") fertig
+ + Fuenfte Dogfight-Karte ("Schwarzes Loch")
+
+v0.9f (03/08/00)
+ + vollstaendige Tastenkonfiguration
+ + Joystick-Unterstuetzung
+ + Arena-Dogfight-Modus mit vier Karten
+
+v0.9e (07/07/00)
+ + Insgesamt zwei Race-Karten
+ + Alle Trainingslevel implementiert
+ + Neues Panel am oberen Bildschirmrand
+ + Ausblenden des Panels mit "P"
+ + diverse Verschoenerungen
+
+v0.9d (...)
+ + Erste Version des Race-Mode mit einer Karte
+ + Ein neuer Gegner
+ + Landen nun ueberall moeglich (theoretisch)
+ + Menue erweitert & mit zusaetzlichen Titeln versehen
+ + Vier Trainingslevel
+
+v0.9c (...)
+ * Schwerer Bug gefixt (sollte auch die restlichen Schwer-Abstuerze noch
+   beseitigen)
+ + Level 9 ueberarbeitet
+ + Anschauen des Scorecodes auch nachtraeglich moeglich
+ + Autofeuer (sehr langsam in Grundkonfiguration)
+ 
+v0.9b (21.02.00) (Eingesandt zum Allegro Games Contest II)
+ + Technik-Beschreibung
+ * Kleinere Aenderungen und Bugfixes
+
+v0.9 (20.02.00)  
+ + ein neuer Level ("Gravitationsspiele")
+ + neuer Grafikeffekt: "Truemmerpixel"
+ + neue Waffe: Minen
+ + Menuemusik
+ + kleine Aenderungen an der generellen Grafik
+ + leichte Aenderungen an Gameplay und Leveldesign
+
+v0.8 (02.02.00)
+ + vier neue grosse Levels ("Big Brother I-III" & "Deathmatch")
+ + Passwortsystem (ein Level muss geschafft werden oder man muss das Pass-
+   wort kennen, um den naechsten spielen zu koennen).
+ + Gravitations'waende'
+ + einige kleinere Aenderungen an Grafik & Gameplay.
+
+v0.7 (15.01.00)
+ + komplettes Sound-Update (noch keine Musik)
+ + Explosionskrater!
+ + Punktesystem leicht veraendert (wieder mal); Die aktuelle hiscore.dat
+   aus dem Internet laesst sich nun downloaden.
+ + Ein neuer Level
+ * Behebung von einigen schweren Bugs
+ * Kleinere Bugfixes (Fading und andere)
+
+v0.6b (23.12.99)
+ + Punktesystem veraendert (mit externer hiscore.dat)
+ + Hiscore-Tabellen auf der GF-Homepage
+ + "Kamikaze" ist nun moeglich (manche, schwaechere, Gegner werden zer-
+   stoert, wenn Sie gegen diese fliegen)
+ + Dokumentation in Deutsch
+ * Einige Bugfixes (Fracht, Menue, ...) 
+
+v0.6 (15.12.99)
+ + komplett neues Timing-System (verdoppelt die Performance nahezu!)
+ + Menuesystem!
+ + Mehrsprachenunterstuetzung (Englisch & Deutsch)
+ + Neues Tileset (benutzt in level 3)
+ + Ein neuer Level
+ + Levelstatistiken
+ + Hiscores!
+ + kleine Aenderungen an Grafik und Gameplay
+ * Bugfixes
+
+v0.5 (10/99)
+ + Zwei komplette Levels (1 & 2)
+ + Neue Waffe (Lenkraketen)
+ + Radar
+ + Karte
+ + Fading-Effekte, "bouncing pixels"
+ + Teleporter und Gravitationsverzerrers (beide in Testphase, 
+   nur im Testlevel enthalten)
+ * kleinere Bugfixes
+
+v0.4
+ + Statuspanel
+ + Schild!
+ + kleine Aenderungen an den Gegnern
+ * Bugfixes
+ + "Lasertueren" und Schalter, um sie zu oeffnen
+ + On Screen Display
+ + einige neue Objekte
+
+v0.3 - v0.0: ??
+
+
+7. DOWNLOAD 
+
+Sie koennen das Spiel von folgender Webseite herunterladen:
+
+http://www.skytrek.de/gf/ger/gf.html
+
+Das Archiv ist ungefaehr 2,5 MB gross.
+
+
+8. RECHTLICHES
+
+Gravity Force ist Freeware ohne jegliche Einschraenkungen. Die Weiter-
+gabe des Programms ist, sofern sie unengeltlich geschieht, absolut er-
+wuenscht. Um veraltete Versionsdownloads von bestimmten Links zu ver-
+meiden, sollte man stattdessen einen Link zu obiger stets aktualisierter
+Webseite bereitstellen. Oder sich ueber Updates auf dem laufenden halten.
+Wer will, kann mir auch eine Mail schicken, dass Interesse an zukuenftigen
+Versionen besteht. Ich werde die entsprechenden Personen dann anschreiben
+und ueber neue Updates informieren.
+
+Als C-Programmierer wuerde man jetzt einfach
+
+  #include <std-disclaimer.h>
+
+schreiben. Aber ich sage es nochmal kurz, damit es auch jeder versteht :)
+
+Natuerlich kann und werde ich absolut keine Haftung fuer Dinge uebernehmen,
+die Gravity Force mit/auf/in/unter/ueber Ihrem Rechner anstellt.
+Deshalb rate ich, vorsichtshalber, dazu, die Diplom-Arbeit vor dem GF-Spiel
+zu sichern. In der momentanen Version sind vielleicht seltene Abstuerze noch 
+moeglich, die unter bestimmten Windows-Konstellationen (so kreativ wie die 
+Unendlichkeit des Universums) zu eben dessen (Total-)Absturz fuehren 
+koennen.
+
+
+9. BACKGROUND
+
+Hintergruende? Wer interessiert sich schon fuer Hintergruende, wenn das 
+Spiel Spass macht? :-)
+
+Wie aus folgendem Abschnitt ersichtlich ist, wurde das Spiel in C mit dem
+freien Compiler DJGPP und der Grafikbibliothek Allegro programmiert.
+
+Bis jetzt (v1.0) ist der Sourcecode etwa 700k gross und besteht aus ca.
+16000 Zeilen. Irgendwann Mitte 1999 habe ich mit der Programmierung an-
+gefangen. Seither programmiere ich meist an freien Wochenenden oder im
+Urlaub. Der Code ist ein Kuriosum an sich und absolut chaotisch (wer hat 
+noch gleich gesagt, dass sich der Charakter eines Programmierers in dessen
+Sourcecode spiegelt? Egal.). Vielleicht gebe ich ihn mal frei. Anfangen
+wird eh kaum jemand was damit koennen, da es mein erstes grosses Projekt
+ist und ich dabei viel gelernt habe (und noch lernen moechte).
+
+Ueber mich schreibe ich lieber nichts, sonst macht das Spiel gleich keinen
+Spass mehr :). Na gut, ein paar Kleinigkeiten: Ich bin momentan 22 Jahre
+alt, mache eine Ausbildung zum Fachinformatiker/Systemintegration, und 
+wohne in einem kleinen Doerfchen genannt Egringen irgendwo ganz weit links
+unten (im sonnigen Suedwesten Deutschlands).
+
+Wahrscheinlich werde ich mich jetzt, wo Version 1.0 endlich fertig ist,
+erst einmal einem neuen Projekt zuwenden. Was das sein wird, weiss ich 
+noch nicht. An GF werde ich natuerlich auch noch weiterarbeiten :-)
+
+
+10. CREDITS
+
+Das Spiel wurde mit der Grafikbibliothek "Allegro" von Shawn Hargreaves
+und DJGPP von D.J. Delorie erstellt. Zusaetzlich benutzte ich "Mappy"
+von Robin Burrows, um die Levels zu erstellen und anzuzeigen. "AllegTTF"
+von Doug Elevald dient der Textausgabe.
+
+Tobias Gaertner erstellte den Teleporter-Effekt, die braune "Jaeger-
+Sonde" sowie die Karten fuer Level 2, 4, 5 (was 6 & 7 einschliesst), 9 und
+10. Die ersten zwei Race-Karten wurden ebenso von ihm erstellt. Danke auch 
+an ihn fuer das schoene GF-Icon (gf.ico).
+
+Die Soundeffekte entstammen verschiedenen Quellen, einschliesslich eigenen
+und dem originalen Gravity Force auf dem Amiga 500.
+
+Ein grosses Dankeschoen an Robin Burrows (noch eins) fuer seine Hilfe bei
+der Menue-Musik.
+
+Michael Kuehnert schrieb die deutsche und die englische Version der 
+technischen Beschreibung. Ein grosses Dankeschoen auch an ihn fuer diesen 
+wirklich tollen Text.
+
+Die Uebersetzung ins Slowakische stammt von Juraj Michalek (georgi@home.sk).
+
+Fuer ihre guten Ideen und das Betatesting bedanke ich mich bei: Michael 
+Kuehnert, Jan Kuehnert, Malte Schmidt, Tobias Gaertner, Erik Wucher, Martin
+Zeilinger, Bastian Guetlin und allen anderen, die mir hilfreiche Tips und 
+Kommentare per eMail zugeschickt haben!
+
+Sie alle sind mit dafuer verantwortlich, dass Gravity Force zu dem wurde,
+was es ist (und sein wird, irgendwann).
+
+Wenn Sie das Spiel moegen oder auch nicht, egal, dann schicken
+Sie mir bitte eine eMail oder fuellen Sie das "Feedback"-Formular auf
+der GF-Homepage aus. Sie koennen dort auch einen kleinen Gaestebuch-
+eintrag hinterlassen. Ich freue mich ueber alles was kommt und keine
+Werbung darstellt :-)
+
+Danke fuer Ihr Interesse.
+
+
+Jens Hassler (lukey@skytrek.de)

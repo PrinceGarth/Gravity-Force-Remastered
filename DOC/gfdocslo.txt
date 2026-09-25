@@ -1,0 +1,366 @@
+...........................................................................
+========================> Gravity Force, v1.02 <===========================
+
+
+1.  Uvod
+2.  Ciel
+3.  Systemove poziadavky
+4.  Ovladanie
+5.  Poznamky k hre
+6.  Historia verzii
+7.  Download
+8.  Autorske prava
+9.  Vyvoj
+10. Kredity
+
+
+
+1. UVOD
+
+Asi pre desiatimi rokmi som si kupil Amigu 500. Prva hra, ktoru som hral,
+bola Manic Mansion. Druhou hrou bolo Gravity Force. Tato hra vo mne
+zanehala dojem na dlhe roky. Hraval som ju znova a znova, a nikdy ma
+neprestala bavit. Tak som prisiel k napadu obnovit tuto hru. Myslim si,
+ze to mozem urobit teraz, bude to moja prva skutocne kompletna hra.
+
+
+2. CIEL
+
+V Gravity Force kontrolujete malu lod. Vasou ulohou je pozbierat vsetok
+naklad a bezpecne sa vratit na vasu zakladnu. Toto by bolo prilis jednoduche,
+keby tam neboli nepriatelia a ziadna gravitacia tahajuca vas dole. Proti
+svojim nepriatelom ste vyzbrojeny malym kanonom (v skutocnosti mate viac ako
+6 roznych zbranovych systemov), proti gravitacii mate zase svoju zrucnost ;)
+
+Mojim cielom nebolo iba vytvorit novu verziu starej klasiky, ale pridat aj
+nejake nove prvky, ako rozne typy misii, ktore mozete najst v kazdom
+"Thrust"-klone. Popri normalnych "nakladovych misiach" musite ochranovat
+ine lode, alebo letiet najst-a-znicit misie. Mojim hlavnym zamerom bolo
+pridat nieco nove do kazdeho levelu. Nizsie levely som sa snazil spracovat,
+tak, aby vyzerali, co "najpodobnejsie" ako orginal. Ak nemozete dokoncit
+misiu, rad vam poslem potrebne heslo, ak ma o to poziadate
+
+S verziou 1.0 "Zavod jedneho hraca" boli konecne implementovane mapy, aj
+ked boli iba 3. Taktiez je v tejto verzii Multiplayer, ale iba "pre dvoch
+hracov, jeden pocitac, jednu obrazovku". V buducnosti planujem pridat
+moznost sietovej hry.
+
+
+3. SYSTEMOVE POZIADAVKY
+
+Gravity force bolo vytvorene na Intel Pentiu 200 s 64 MB RAM. Hra potrebuje
+8 MB RAM a bezi celkom v pohode pod DOSom a tiez v DOSackom okne pod
+WIN 95/98. Od v0.6 moze bezat na Pentiu 133 alebo pomalsom (viac-menej).
+Rychlejsi znamena lepsi (vseobecne pravidlo).
+
+DOSacka verzia NEbezi pod Win NT alebo Win 2K. Myslim, ze taky Windows by
+nemal obmedzovat, pokial mate nainstalovany DirectX 7. Ale neberiem na
+seba zodpovednost za nespravne chovanie programu !
+
+
+4. OVLADANIE
+
+Mozete pouzivat vsetky klavesy pre jedneho a dvoch hracov v Nastaveni Hry.
+Taktiez mozete pouzit joystick alebo gamepad.
+
+Nasledujuce klavesi su navolene ako default
+
+MEDZERA      --  Urychlenie
+Sipka Vlavo  --  Otoci lod dolava
+Sipka Vpravo --  Otoci lod doprava
+Sipka Hore   --  Vystreli z vybranej zbrane
+
+1            --  Veber standardnu zbran
+2            --  Vyber zdvojenu strelbu
+3            --  Vyber balisticke bomby
+4            --  Vyber megabombu
+5            --  Vyber navadzane strely
+6            --  Vyber miny
+
+Enter        --  Specialne / Detonacia vsetkych min
+
+
+Nemozete na ovladanie lode pouzivat nasledujuce klavesy:
+
+P            --  Ukaz/skry info panel (hra na celej obrazovke)
+R            --  Nastav zvacsenie radaroveho okne (1x-5x)
+
+Pause        --  Pauza :-)
+F12          --  Sprav Screenshot
+ESC          --  Zrus hry, spat do menu
+Shift+ESC    --  (v menu) opusti hru (menu) okamzite
+
+PgUp/PgDn    --  Zmen zobrazovanie skore (Menu)
+
+
+
+> DOLEZITA poznamka
+-------------------
+
+Pri Suboj-2-Hracov je jedno obmedzenie (hardver) v pripade, ze obaja hraci
+pouzivaju jednu klavesnicu. Ak su 4 alebo viac klaves zmacknutych v jendom
+momente, klavesnica nemusi spravne rozpoznat vsetky stlacenia a na vystup
+sa dostavaju chybne hodnoty. Toto spravanie je zavisle na type vasej
+klavesnice.
+
+
+5. POZNAMKY K HRE
+
+ -- Nastavenia : "pixel amount" znamena, kolko efektovych pixelov sa zobrazi.
+    Takze, ak mate pomaly stroj, znizte hodnotu, ale ak mate rychlejsi stroj
+    a mate radi piexly, zvyste toto cislo. (0% znamena ziadne pixely, 200%
+    znamena dvojnasobne mnozstvo pixelov, ako "normal").
+
+ -- Nastavenia : "Deviaciu pixelov" zapinajte iba v pripade, ze mate skutocne
+    rychly stroj! ("Rychly": >= Pentium II)
+    V skutocnosti to vela nespravi, ale pixely su gravitaciou pritahovane
+    k stenam, ak tam nejake su. Takze ak spustite hru na pomalsom pocitaci
+    a zobrazi sa velke mnozstvo pixelov, hra zacne sekat (az niekolko sekund)
+ 
+ -- Bodovaci system: Body su odratavane v zavislosti od "delitela casu",
+    ktory je definovany pre kazdy level. Tento delitel je pre vacsinu levelov
+    deklarovany ako 0.01-0.04. Takze ak potrebujete 100 sekund na dokoncenie
+    misise, vase skore bude zmensene 100 * (100*0.03) = 300 bodov.
+
+    Rada: Ak zabijete vsetkych nepriatelov v jednom leveli, dostanete bonusove
+    skore 1000 bodov (Poznamka: Niekedy nestaci zlikvidovat iba samostatnych
+    nepriatelov, napriklad ked su v okoli velky cerveny). A ak nestratite
+    ani jeden zivot, dostanete pridanych 700 bodov.
+
+ -- Nepriatelia: Mozete zabit aj "velkych cervenych" (200 zasahov), ale
+    nikdy to nebudete potrebovat. Je vzdy nejaky sposob, ako sa im vyhnut.
+ 
+ -- "Internetove HiSkore Kody": Ak sa dostanete do HiSkore, ukaze sa vam kod.
+    Odpiste si ho a navstivte Gravity Force homepage
+    (www.skytrek.de/gf/gf.html), kliknite na "hiscores" a vyplnte formu na
+    tejto stranke. Meno (vase meno) musi byt pouzite presne take iste ako
+    v Gravity Force. Kliknite na "Update!" a vase skore bude pridane do
+    tabulky ;)
+
+ -- Suboj:
+
+    Extra vyber:       Ziadne    --  Ziadne Extra
+                       Ojedinele --  Priblizne pri 4 destrukciach
+                       Casto     --  Priblizne pri 2 destrukciach
+                       Mnoho     --  Kazda destrukcia znamena Extra
+
+
+ -- Chyby: S v1.0 bolo vela chyb odstranenych. Ak sa hra na vasom systeme
+    zruti, tak prosim (!) zaslite mi email. Vdaka!
+
+    Verzia 1.0 hry je nanestastie nekompaktibilna s hiscore.dat v starsich
+    verziach.
+
+6. HISTORIA VERZII
+
+- historia je len v anglictine, pretoze pochybujem, ze ten kto by mal zaujem
+  o taketo informacie nebude poznat anglictinu. A keby aj ano, tak mi moze
+  napisat, ja mu to prelozim ;) georgi@home.sk
+
+v1.02 (24/09/00)
+ + Full translation to Slovak language (by Juraj Michalek)  
+  
+v1.01 (02/09/00)
+ * Bugfix: "Hit percentage" error mainly in Level 10
+ + Shift+ESC leaves menu immediately
+
+v1.0 (26/08/00)
+ ! First official version after 0.9b
+ + some bugfixes, double keys no more possible
+ + All points below beginning with v0.9c
+
+v0.9j (18/08/00)
+ + All files from the /map and /lng directories now in two data files
+ + Text messages now disppaear when you start from a base
+ + Menu: ESC now equivalent to "Back" button
+ * Bugfixes
+
+v0.9i (14/08/00)
+ + Dogfight: Selections for weapon and extras amount
+ + Race: Start & End now identical
+ + Third race map
+ * Some bugfixes
+
+v0.9h (09/08/00)
+ ! first pre1.0 version for betatesters
+ + slightly more intelligent rockets
+ + slightly more intelligent probes
+ + compiled a Windows version
+
+v0.9g (08/08/00)
+ + New single player level: "Pacifism"
+ + Fifth dogfight map ("Black Hole")
+
+v0.9f (03/08/00)
+ + complete keyboard configuration
+ + Joystick support
+ + Arena-Dogfight mode with four maps
+
+v0.9e (07/07/00)
+ + Two race maps
+ + All training levels implemented
+ + New panel on the top of the screen
+ + Hiding the panels with "p"
+ + some minor graphical changes
+
+v0.9d (...)
+ + First version of race mode with one map
+ + One new enemy
+ + You can (theoretically) now land everywhere
+ + Menu enhanced
+ + four training levels
+
+v0.9c (...)
+ * fixed a very serious bug (which caused crashing of the machine)
+ + fixed some bugs in Level 9
+ + You can review your scorecodes now in the highscore table
+ + Autofire (very slow in basic configuration)
+
+v0.9b (21.02.00)  (sent to the AGCII)
+ + Text: "Technical Overview"
+ + slight changes and bugfixes
+
+v0.9 (20.02.00)
+ + one new level ("Gravity Games")
+ + new graphic effect "debris pixels"
+ + new weapon: mines
+ + menu music
+ + some changes to general graphics
+ + some little changes in gameplay and level design
+
+v0.8 (02.02.00)
+ + four new big levels ("Big Brother I-III" & "Deathmatch")
+ + password system (you must complete a level or know the password to
+   play the next one)
+ + gravitation 'walls'
+ + some little changes to gameplay and graphics
+
+v0.7 (15.01.00)
+ + complete sound update (but still no music yet)
+ + explosion craters
+ + scoring system changed (once again); you can now download the
+   hiscore.dat on the Internet to your system.
+ + one new level
+ * fixed some very ugly bugs... (that crashed the system)
+ * fixed some not so ugly bugs (fading and other)
+
+v0.6b (23.12.99)
+ + scoring system changed (with external hiscore.dat)
+ + hiscore tables on the GF website
+ + "Kamikaze" now possible (some enemies are killed when you fly against
+   them)
+ + German documentation
+ * some bugfixes (cargo, menu, ...)
+
+v0.6 (15.12.99)
+ + completely new timing system (nearly doubles performance!)
+ + menu system!
+ + multi language support (English & German)
+ + new nice tileset (used in level 3)
+ + one new level
+ + level statistics
+ + hiscores!
+ + slight changes in graphics and gameplay
+ * bugfixes
+
+v0.5 (10/99)
+ + Two complete levels (1 & 2)
+ + new weapon (guided rockets)
+ + radar
+ + map
+ + fading effects, "bouncing pixels"
+ + teleporters and gravitation distortion units (both in test phase,
+   only active in test level)
+ * minor bugfixes
+
+v0.4
+ + Status panel
+ + shield!
+ + some minor additions to enemies
+ * bugfixes
+ + "laser doors" and a switch to unlock them
+ + on screen display
+ + some new objects
+
+v0.3 - v0.0: ??
+
+
+7. DOWNLOAD
+
+Mozete si hru stiahnut zo stranky
+
+http://www.skytrek.de/gf/gf.html
+
+Archiv ma nieco okolo 2,5 MB
+
+
+8. AUTORSKE PRAVA
+
+Gravity Force je Freeware bez akychkolvek obmedzeni. Mozete program volne
+distribuavat, pokial ho budete volne sirit. Aby sa predislo chybam so starymi
+verziami je dobre vlozit aj odkaz na homepagu, ktora byva aktualizovana.
+Taktiez mi mozete zaslat eMail, ak chcete byt informovany o dalsich verziach.
+
+Ako spravny C-karsky programator pisem
+
+  #include <std-disclaimer.h>
+
+ale to iste poviem aj pre ostatnych :-)
+
+Samozrejme, ze neberiem za seba ziadnu zodpovednost za vsetky veci, ktore
+Gravity Force robi na vasom pocitrci. Takze ak sa ponahlate, sejvnite si
+najskor svoju pracu pred hranim GF. Hra sa moze nepredvidatelne zrutit,
+v povodnej verzii moze padnut na vsetkych Win systemoch (ktory ma chyb
+ako hviezd vo vesmire)
+
+9. VYVOJ
+
+Vyvoj? Kto sa zaujima o vyvoj, ked sa moze zabavat s hrou?
+
+Ak prve by som asi spomenul DJGPP s C kompilatorom a graficku kniznicu
+Allegro. Doteraz (0.9b) ma zdrojovy kod 700k odhadom pozostava zhruba
+z 16000 riadkov.
+
+Zacal som programovat v lete roku 1999. Odvtedy som programoval kazdy volny
+vikend a prazdniny. Program bol absolutne chaosny (odkedy to bol moj velky
+projekt). Mozno bude raz uspesne dokonceny :-)
+
+Nie je vela co povedat o sebe: Mam 22 rokov a studujem ako pocitacovy
+"specialista". Zijem v malej dedinke zvanej Egringen na juhozapade nemecka.
+
+
+10. Kredity
+
+Hra bola vytvorena s pouzitim "Allegra" od Shawn Hargreaves a DJGPP od
+D.J. Delorie. Dalej som vyuzil "Mappy" od Robin Burrows na vytvaranie
+a zobrazovanie map hier a "AllegTTF" od Doug Elevald na fonty.
+
+Tobias Gaertner vytvoril teleportacny efekt, a hnedych "utocnych" nepriatelov
+a mapy pre levely 2, 4, 5 (obsahujuce 6 & 7), 9 a 10. Prve dve pretekove
+mapy su taktiez jeho praca. A taktiez vdaka za peknu ikonku (gf.ico).
+
+Zvukove efekty boli ziskane z roznych zdrojov, pouzite boli taktiez
+originalne zvuky z hry GF pre Amigu 500.
+
+Vdaka Robin Burrows (znova) za jeho velku pomoc pri hudbe v menu. Je to
+navrhnute podla originalneho traku v GF.
+
+Michael Kuehnert napisal anglicku a nemecku verziu textov
+"Gravity Force: Technical Overview".
+
+Juraj Michalek napisal slovensku verziu textov. (georgi@home.sk)
+
+Velka "VDAKA" : Michael Kuehnert, Jan Kuehnert,
+Malte Schmidt, Tobias Gaertner, Erik Wucher, Martin Zeilinger, Bastian
+Guetlin a vsetkym, co mi poslali eMailom komentare.
+
+Ak sa vam hra paci, alebo ak je nieco co sa vam naopak nepaci, poslite mi
+eMail, alebo vyplnte formular na Gravity Force homepage.
+Taktiez sa mozete zapisat do guestbooku.
+
+Vdaka za zaujem.
+
+
+Jens Hassler (lukey@skytrek.de)
+
+

@@ -1,0 +1,17 @@
+...........................................................................
+=========================> Gravity Force, v1.02 <==========================
+
+
+Welcome to Gravity Force!
+
+Please have a look into the /DOC directory to find the readme file for your
+preferred language:
+
+   English       -> gfdoceng.txt
+   German        -> gfdocger.txt
+   Slovak        -> gfdocslo.txt
+   
+
+Have fun,
+
+Jens Hassler

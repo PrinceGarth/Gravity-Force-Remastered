@@ -1,0 +1,188 @@
+Gravity Force - Technische šbersicht
+
+1. Die Technologie des Konsortium
+
+1.1 Raumschiffe
+
+1.1.1 Rckblick
+
+  Bei der Groáen Terranischen Abrstung fielen groáe Stckzahlen von
+  weltraumtauglichen Waffenplattformen an. Eines von ihnen war die letzte
+  flssigkeitsbetriebene Interkontinentalrakete, die chinesische
+  zweistufigen Hian Gu 8, die erfolgreich und kostengnstig fr nicht
+  milit„rische Nutzung modifiziert werden konnte.
+
+  An Stelle des nuklearen Mehrfachsprengkopfes wurden zun„chst die
+  blichen Navigations-, Kontroll- und Wiedereintrittssysteme sowie eine
+  Frachtkabine installiert, wodurch der teilweise wieder verwendbare
+  Versorgungsflieger SC-8 fuer die orbitalen Raumstationen enstand.
+
+  Die Modifikation SC-10 mit einer Passagierkabine statt des
+  Frachtraums wurde ein grosser Erfolg auf kommerziellen Fluegen und
+  hatte statistisch eine mittlere Zeit zwischen Ausf„llen von 49
+  Stunden, was zu der Zeit keines der Tr„gersysteme mit dem noch
+  experimentellen Gravitations-Antrieb leisten konnte.
+
+  Jahre nach Aussortierung der SC-8 und SC-10-Hauptstufen hatten
+  sich im Auftrag der Erdregierung Kontrukteure der Wiederbelebung
+  des alten Designs verschrieben, als die Mittel fr Neubauten knapp
+  wurden. Mit einem modernen Mikro-Gravitations-Antrieb, der nur
+  einen Bruchteil des Raumes des alten Antriebs einnahm, entstand
+  das Transportsystem RC-18, das in Flexibilitaet, Nutzlast und
+  Systemkompatibilitaet den brigen kommerziellen Produkten in nichts
+  nachstand.
+
+  Der einzige gr”áere Nachteil der verwendeten Plattform war die geringe
+  Manoevrierfaehigkeit durch das Fehlen von leistungsf„higen Reaktions-
+  Kontroll-Systemen, weil diese von der Hllenstruktur nicht untersttzt
+  werden konnten. So konnte der Pilot Fluglage letztlich nur durch durch
+  relativ langsame Drehung mit den Stabilisierungstriebwerken und
+  kontrollierte Ausloesung des Hauptantriebes veraendern.
+
+1.1.2 Die Gegenwart
+
+  Die paramilitaerische Verwendung dieser Plattform kam bald, als
+  die Betreibergesellschaften entfernter Bergbaukolonien den Einfall
+  einer fremden kriegerischen Kultur meldeten. Sie bildeten kurzerhand
+  eine Gruppierung namens Das Konsortium und bedienten sich des RC-18,
+  um unabhaengig von der politisch handlungsunf„higen Flotte der
+  Groáen Terranischen Allianz den Eindringling abwehren zu k”nnen.
+
+  Es entstanden mehrere Kampfgleiter und -bomber, teilweise nur in sehr
+  geringen Stckzahlen. Die Waffen sind saemtlich GTA-Designs und durch
+  verdeckte Kanaele geliefert, das Schildsystem Resultat der technischen
+  Entwicklung einer bei den einfachen mehrzelligen Lebensformen vom Mars
+  beobachteten natrlichen Schutzfunktion. Alle Flieger koennen auf Basen
+  landen und schnell Fracht und Personal sowie Nachschub und modulare
+  Systeme aufnehmen.
+
+1.1.3 šbersicht: Gefechtserprobte Versionen des RC-18
+
+                    C-118.1 "Flyout"
+        Bewaffnung: 1x LXB-5B
+      Schildsystem: Nicht vorhanden
+     Bombenschacht: Nicht vorhanden
+  Zusatzbewaffnung: Nicht m”glich
+
+                    C-118.4 "Desiato"
+        Bewaffnung: 1x LXB-5G
+      Schildsystem: Vorhanden
+     Bombenschacht: Nicht vorhanden
+  Zusatzbewaffnung: 1x LXD-5
+                    1x TBS-91
+
+                    C-118.9 "Piranha"
+        Bewaffnung: 1x LXB-5G
+      Schildsystem: Vorhanden
+     Bombenschacht: Vorhanden
+  Zusatzbewaffnung: 1x LXD-5
+                    TBS-91B
+                    TBE-29
+                    ISG-64D
+                    AMU-47
+                    und weitere
+
+
+1.2 Waffen
+
+  Die Waffen sind nach Funktionsprinzip sortiert:
+
+1.2.1 Energiewaffen
+
+  Es existieren zwei unterschiedliche Systeme, die beide unter der umgangs-
+  sprachlichen Bezeichnung "Blaster" bekannt sind und vergleichbare Wirkung
+  und Einsatzm”glichkeiten, aber unterschiedliche technische Grundlagen haben.
+
+1.2.1.1  "Single Blaster"
+
+  Der Single Blaster basiert auf schlichter alter Partikeltechnologie.
+  Durch eine moderne Entladungskammer wird ein hoch fokussierter, hoch
+  energetischer Partikelstrahl mit kurzer Entladungsdauer emittiert.
+
+  Verfgbare Modelle:
+
+  LXB-5B Single Blaster („lteres, weit verbreitete Modell)
+  LXB-5G Single Blaster (geringer Energieverbrauch)
+  LXB-5K Single Blaster (zur station„ren Verteidigung von Installationen)
+
+1.2.1.2  "Double Blaster"
+
+  Der Double Blaster vereint den geringen Platzbedarf und die hohe System-
+  kompatibilit„t des Single Blaster mit doppeltem Energieausstoá. Dieser
+  Vorteil wird durch ein wesentlich schnelleres Ausbrennen des Energie-
+  konverters erkauft, der regelm„áig ausgetauscht werden muss.
+
+  Verfgbares Modell:
+
+  LXD-5A Double Blaster
+
+1.2.2 Explosionssprengk”rper
+
+  Der Mensch nutzt kontrollierte Explosionen seit zweitausend Jahren fr
+  Waffen, und auch heute noch sind sie aus den Arsenalen nicht weg zu
+  denken.
+
+  Ungelenkte Bomben sind unvergleichlich kosteneffektiv; gelenkte Bomben
+  (seit dem ausgehenden ersten Jahrtausend im Einsatz) sind teurer,
+  pr„ziser und t”dlicher. Ihr aktiver oder teilaktiver Antrieb erm”glicht
+  hohe Man”vrierbarkeit, Nutzlast und/oder Reichweite. In Form von
+  Flugk”rpern haben sie durch ihre genaue Steuerbarkeit viele Anwendungs-
+  gebiete, w„hrend Raketen sich vor allem durch ihre hohe Feuerrate
+  auszeichnen.
+
+1.2.2.1 "Bomb"
+
+  Reiner Splittereffekt, die explosive Wirkung des chemischen Sprengstoffes
+  reiát die Umhllung der Bombe in kleine Stcke, die sich radial vom
+  Explosionsort entfernen und beim Auftreffen ihre Wirkung entfalten.
+
+  Diese Bombe wird in Flugrichtung beschleunigt ausgestossen und beschreibt
+  dann eine einfache ballistischen Flugbahn.
+
+  Verfgbares Modell:
+
+  TBS-91B Bomb          (Auftreffznder)
+
+1.2.2.2 "Big Bomb"
+
+  Hllenbrechende konventionelle Bombe mit geringer Streuwirkung, erm”glicht
+  das zielgerichtete Ausschalten massiver Gegner oder Stellungen.
+
+  Zum Abwurf ist ein Bombenschacht erforderlich, der die Einheit ob ihrer
+  hohen Masse direkt in Richtung des Gravitationszentrums entl„sst.
+
+  Verfgbares Modell:
+
+  TBE-29 Big Bomb       (Auftreffznder)
+
+1.2.2.3 "Missile"
+
+  Mehrzweck-Flugk”rper zur Verwendung gegen Installationen und Flugobjekte.
+  Vom Zielerfassungsrechner der feuernden Plattform instruiert, verwenden
+  sie infrarot- und LIDAR-Zielerfassung, um sich dem Ziel anzun„hern und
+  kurz vor dem Auftreffen den Sprengkopf zu znden. Befindet sich kein Ziel
+  in Reichweite oder im anf„nglichen Erfassungbereich, zerst”rt er sich
+  nach einer gewissen Zeit von selbst oder explodiert beim Auftreffen auf
+  feste Materialien.
+
+  Da die komplexe eingebaute Steuerung viel Raum einnimmt, ist die
+  Sprengstoff-Nutzlast etwas geringer als die der TBS-91 Bomb.
+
+  Verfgbares Modell:
+
+  ISG-64D Missile      (Ann„herungs- und Auftreffznder)
+
+1.2.2.4 "Mine"
+
+  Klassische Ann„herungsmine, die sich durch einen eigenen Antrieb eine
+  gewisse Zeit an einer Stelle halten kann, um Feinden den Weg zu
+  versperren. Integrierte Freund-Feind-Kennung.
+
+  Verfgbare Modelle:
+
+  AMU-47A Contact Mine  (geringe Sprengwirkung, geringer Ausloesungsradius)
+  AMU-47B Contact Mine  (mittlere Sprengwirkung, mittlerer Radius)
+  AMU-47D Contact Mine  (hohe Sprengwirkung und Ausloesungsradius)
+
+
+[EOF]

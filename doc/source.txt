@@ -1,0 +1,116 @@
+GRAVITY FORCE v1.01 -- Sourcecode
+=================================
+
+
+** COMPILING **
+
+Hi to all who are crazy enough to have a look at the source code
+of GF.
+
+If you just want to compile this thing, you'll need the libraries:
+
+ -- DJGPP 2.0
+ -- Allegro 3.9.32
+ -- AllegTTF 1.5
+ -- JGMod
+
+If you have all of these installed, compile GF by calling
+
+  make all
+
+This compiles the source code, makes the executable "gfnew.exe" and
+moves it one directory higher (which should be your GF directory).
+
+This will compile quite well on the DOS platform.
+
+
+If you want to make a windows executable, you need a Windows compiler.
+It works best if you have M$ Visual C++ 6 or above with the Direct X7
+Header files installed. 
+
+You can also make a Linux executable if you have installed the appropriate
+libraries (Allegro, JGMod) for this platform.
+I've once made such a Linux version, so I know that it works.
+
+
+
+** NOTES **
+
+I know...
+
+ ...that the source isn't documented very well. And that there are many
+    comments in German.
+
+ ...that it doesn't look very well and that I shouldn't have used one
+    single header file for all the major game variables :)
+
+ ...that some functions are way toooo long.
+
+
+But hey, that's how things are :-). I won't encourage anyone to use this
+code in his/her own projects, but if you're willing to do this, you're
+welcome.
+
+And if you take the whole code to make a new and better Gravity Force out
+of it, I'd be very happy to host this version on the GF website.
+
+
+** MORE NOTES **
+
+The following routines have been replaced or modified for this source
+archive:
+
+  read_config_file() and write_config_file() in gfcnfg.h
+  CalcScoreString() and CalcRaceScoreString() in gfstat.h
+  
+First because I don't want you to modify the highscore file.
+And second because I don't want to give out the functions for the 
+Internet highscores (this would make the system useless).
+
+
+** LEVEL CREATION **
+
+Ohoh, this is the most "crappy" part. 
+
+The levels in GF are created this way:
+
+  -- Create level map (.mar file) with "Mappy" by Robin Burrows (-> test.mar)
+  -- Copy this map file to the /MAPS folder 
+  -- Change the global variables in gfedinit.c to reflect the names
+     of the new .mar file and the .cfg file to be created
+     (test.mar and test.cfg)
+  -- Run gfed and set the location of all objects and enemies. Also
+     set the path points (do this first)
+  -- Click on 'save' in each dialog
+  -- Create a new .ini file in the /MAPS folder (test.ini). 
+  -- Load the dat files (simple text files with init code) created by
+     the editor (gfdat.obj, gfdat.pnt, gfdat.enm, gfdat.obs...). Include
+     their contents in the appropriate places of the ini file.
+  -- Edit the ini file (test.ini) and set the parameters you want for
+     each enemy and object :)
+  -- Once you've finished doing this, edit gflinit.c to include test.ini
+     and compile it.
+  -- Add new 'case' entries for the new level in gflevel.c
+  -- Add new menu functions in gfmenu.c for the new level
+     (mostly: set the max_*_levels varibles in gf.c to reflect the new
+     level amount).
+  -- Change the variable 'write_files' to 'TRUE' in gf.c
+  -- Compile the whole thing and run it. Once you start the new level,
+     the appropriate cfg file (test.cfg) will be created.
+  -- include the cfg file in the gfmaps.dat file
+
+I think you don't want to do this. It's a crappy system, but I didn't want
+to program a whole level editor. This would've been a very hard job, 
+because there are so many different options and parameters for each enemy
+and object...
+
+I can't give you much more advice. Look at the examples and the code if
+you want to understand it. 
+
+
+
+If you have any questions, write to lukey@skytrek.de
+
+
+Have much fun ;-)
+Jens Hassler
