@@ -36,6 +36,7 @@ This file has two parts:
 ### Fixed
 - Enemies following a path, such as the orange orb in the test level, jumped back and forth. The cause was a name clash with glibc's `fmul`/`fsqrt`.
 - Craters from the big bomb acted as solid ground.
+- Typewriter messages at the start of a level showed as one long line, with the beginning hidden and `^` in place of line breaks. The language files mark line breaks with byte 0xF8, which the code didn't recognise.
 - Language switching:
   - text from the previous language stayed on screen;
   - an unrecognised entry in a language file overwrote the text of the entry before it.

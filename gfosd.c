@@ -65,6 +65,9 @@ void show_normal_osd_message(FONT *f1, FONT *f2, char *m1, char *m2, int le, int
   osd_counter = le;
 }
 
+// end of a typewriter line; the .lng files mark line breaks with CP437 0xF8 (degree sign)
+static int eol(char c) { return c == '\0' || c == '^' || (unsigned char)c == 0xF8; }
+
 // l1 = Speed, l2 = Time after eot
 void show_typewriter_osd_message(FONT *f, char *m, int l1, int l2, int col, int y)
 {
@@ -74,7 +77,7 @@ void show_typewriter_osd_message(FONT *f, char *m, int l1, int l2, int col, int 
 
   // Erste Zeile rausfischen
   nr = 0; nr2 = 0;
-  while ( (osd_buf.text[nr] != '\0') && (osd_buf.text[nr] != '^') )
+  while (!eol(osd_buf.text[nr]))
   {
     osd_buf.curline[nr2] = osd_buf.text[nr];
     nr++;
@@ -111,7 +114,7 @@ void update_typewriter_osd_message()
     {
       nr = osd_buf.gpos;
       nr2 = 0;
-      while ( (osd_buf.text[nr] != '\0') && (osd_buf.text[nr] != '^') )
+      while (!eol(osd_buf.text[nr]))
       {
         osd_buf.curline[nr2] = osd_buf.text[nr];
         nr++;
