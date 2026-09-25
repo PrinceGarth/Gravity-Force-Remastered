@@ -4,3 +4,5 @@
 .mcp.json
 /gf.exe
 *.zip
+/gf.log
+*.tar.gz

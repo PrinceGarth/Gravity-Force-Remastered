@@ -9,7 +9,7 @@ This file has two parts:
 
 # Part 1: Gravity Force Remastered
 
-## Unreleased
+## 0.1.0 (2026-09-25)
 
 ### Added
 - Mouse control in single-player games:
