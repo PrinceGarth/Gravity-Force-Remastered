@@ -327,7 +327,7 @@ int play_sp_level()
     }
 
     // pause
-    if (key[KEY_PAUSE]) { gpause = TRUE; clear_keybuf(); while (!keypressed()); gpause = FALSE; }
+    if (key[KEY_PAUSE]) { gpause = TRUE; wait_keys_up(); while (!keypressed()) rest(1); wait_keys_up(); gpause = FALSE; }
 
   } // while !keyESC
 

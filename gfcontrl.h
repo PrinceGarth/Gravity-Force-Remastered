@@ -44,4 +44,6 @@ void read_keys(int c);
 void check_collisions(BITMAP *scr, int c);
 void lay_extra(int c);
 int getctrl(int c, int reset);
+int tap(int k);
+void wait_keys_up(void);
 

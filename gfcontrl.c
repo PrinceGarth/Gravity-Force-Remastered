@@ -11,6 +11,7 @@
 
 #include "gfhead.h"
 #include "gfcontrl.h"
+#include <limits.h>
 #include "gf.h"
 #include "gfdraw.h"
 #include "gfinit.h"
@@ -80,12 +81,20 @@ static long ms(void)
 }
 
 // true once per key press (toggles must not flip every frame while held)
-static int tap(int k)
+int tap(int k)
 {
   static char held[KEY_MAX];
   int t = key[k] && !held[k];
   held[k] = key[k] ? 1 : 0;
   return t;
+}
+
+// wait until every key is up and drop buffered keys, so the next wait needs a fresh press
+void wait_keys_up(void)
+{
+  int k;
+  for (k = 1; k < KEY_MAX; k++) while (key[k]) rest(1);
+  clear_keybuf();
 }
 
 int getctrl(int c, int reset)
@@ -105,7 +114,7 @@ int getctrl(int c, int reset)
     if (!key[c]) { next[c] = 0; return 0; }
     now = ms();
     if (next[c] && now < next[c]) return 0;
-    next[c] = now + (next[c] ? 100 : 500);
+    next[c] = c == KEY_ENTER ? LONG_MAX : now + (next[c] ? 100 : 500);   // Enter never repeats
     return 1;
   }
 
@@ -597,7 +606,7 @@ void read_keys(int c)
 //  if (key[KEY_D]) { if (drop_points) { drop_points = FALSE; redraw = TRUE; } else { drop_points = TRUE; draw_splines(); } clear_keybuf(); }
   if (USE_CHEATS) if (tap(KEY_C)) { if (NO_CLIP) { NO_CLIP = FALSE; } else NO_CLIP = TRUE; clear_keybuf(); }
 
-  if (key[KEY_F12]) save_screen = TRUE;
+  if (tap(KEY_F12)) save_screen = TRUE;
 
   // sonstiges (Test)
 //  if (key[KEY_F]) { fade_out_active = TRUE; fade_pos = 0; fade_opos = 0; fade_type = 1; fade_count = 0; fade_count_to = 40; fade_speed = 0.2; clear_keybuf(); }

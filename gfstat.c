@@ -15,6 +15,7 @@
 #include "gfrace.h"
 #include "gfmisc.h"
 #include "gfsound.h"
+#include "gfcontrl.h"
 #include <ctype.h>
 
 extern int start_lifes;
@@ -148,6 +149,7 @@ void input_name(char *dtext, char *name)
 
   strtrim(config_file.config.last_hiscore_name);
   strcpy(text,config_file.config.last_hiscore_name);
+  wait_keys_up();
 
   // back box
   rectfill(vscreen,SCREEN_W/2 - l/2 - 20, 150, SCREEN_W/2 + l/2 + 20, 240, col_blue);
@@ -230,6 +232,7 @@ void generate_statistics()
   clear(screen);
 
   text_mode(-1);
+  wait_keys_up();
 
   while (!keypressed())
   {
@@ -462,10 +465,10 @@ void generate_statistics()
     blit(vscreen,screen,0,0,0,0,SCREEN_W,SCREEN_H);
 
 
-    clear_keybuf(); while (!key[KEY_ENTER]);
+    wait_keys_up(); while (!key[KEY_ENTER]) rest(1);
   }
 
-  clear_keybuf();
+  wait_keys_up();
 
   clear(screen); clear(vscreen);
 
@@ -483,6 +486,7 @@ void generate_race_statistics()
   clear(screen);
 
   text_mode(-1);
+  wait_keys_up();
 
   while (!keypressed())
   {
@@ -581,10 +585,10 @@ void generate_race_statistics()
     blit(vscreen,screen,0,0,0,0,SCREEN_W,SCREEN_H);
 
 
-    clear_keybuf(); while (!key[KEY_ENTER]);
+    wait_keys_up(); while (!key[KEY_ENTER]) rest(1);
   }
 
-  clear_keybuf();
+  wait_keys_up();
 
   clear(screen); clear(vscreen);
 
@@ -606,6 +610,7 @@ void generate_2pdog_statistics()
   text_mode(-1);
 
   stop_sound_sample(snd_thrusters);
+  wait_keys_up();
 
   while (!keypressed())
   {
@@ -739,10 +744,10 @@ void generate_2pdog_statistics()
     blit(vscreen,screen,0,0,0,0,SCREEN_W,SCREEN_H);
 
 
-    clear_keybuf(); while (!key[KEY_ENTER]);
+    wait_keys_up(); while (!key[KEY_ENTER]) rest(1);
   }
 
-  clear_keybuf();
+  wait_keys_up();
 
   clear(screen); clear(vscreen);
 

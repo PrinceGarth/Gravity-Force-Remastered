@@ -41,6 +41,7 @@ DATAFILE *odata;
 int quit_menu = FALSE, begin_play = FALSE;
 int show_level = -1;
 int lock_keyboard = FALSE;
+static int menu_esc = FALSE;   // Esc pressed this frame (once per press)
 char tmpstr[100];
 static int input_active = FALSE;
 char input_string[60];
@@ -2489,7 +2490,7 @@ void do_menu_sp_sel()
       button[actual_button].state = ST_PRESSED;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_MAIN;
@@ -2619,7 +2620,7 @@ void do_menu_splayer()
       button[actual_button].state = ST_PRESSED;
       clear_keybuf();
     }
-    else if (key[KEY_PGUP] && !lock_keyboard)
+    else if (getctrl(KEY_PGUP,1) && !lock_keyboard)
     {
       if (score_pos > 0) score_pos--;
       CalcScoreString(score_str,
@@ -2627,7 +2628,7 @@ void do_menu_splayer()
                       hiscore_file.hiscore[current_level].nr[score_pos].score);
       clear_keybuf();
     }
-    else if (key[KEY_PGDN] && !lock_keyboard)
+    else if (getctrl(KEY_PGDN,1) && !lock_keyboard)
     {
       if (score_pos < 9) score_pos++;
       CalcScoreString(score_str,
@@ -2635,7 +2636,7 @@ void do_menu_splayer()
                       hiscore_file.hiscore[current_level].nr[score_pos].score);
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_SPLAYER_SEL;
@@ -2733,7 +2734,7 @@ void do_menu_mp_sel()
       button[actual_button].state = ST_PRESSED;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_MAIN;
@@ -2865,7 +2866,7 @@ void do_menu_sp_race()
       button[actual_button].state = ST_PRESSED;
       clear_keybuf();
     }
-    else if (key[KEY_PGUP] && !lock_keyboard)
+    else if (getctrl(KEY_PGUP,1) && !lock_keyboard)
     {
       if (score_pos > 0) score_pos--;
       CalcRaceScoreString(score_str,
@@ -2875,7 +2876,7 @@ void do_menu_sp_race()
                       hiscore_file.race_hiscore[current_sprace_level].nr[score_pos].hs);
       clear_keybuf();
     }
-    else if (key[KEY_PGDN] && !lock_keyboard)
+    else if (getctrl(KEY_PGDN,1) && !lock_keyboard)
     {
       if (score_pos < 9) score_pos++;
       CalcRaceScoreString(score_str,
@@ -2885,7 +2886,7 @@ void do_menu_sp_race()
                       hiscore_file.race_hiscore[current_sprace_level].nr[score_pos].hs);
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_SPLAYER_SEL;
@@ -3275,7 +3276,7 @@ void do_menu_qdogfight()
 
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_MPLAYER_SEL;
@@ -3403,7 +3404,7 @@ void do_menu_sp_training()
       button[actual_button].state = ST_PRESSED;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_SPLAYER_SEL;
@@ -3632,13 +3633,13 @@ void do_menu_options()
 
       clear_keybuf();
     }
-    else if ((key[KEY_ESC]) && (button[actual_button].state == ST_PRESSED) && !lock_keyboard)
+    else if ((menu_esc) && (button[actual_button].state == ST_PRESSED) && !lock_keyboard)
     {
       button[actual_button].state = ST_SELECTED;
       if (button[actual_button].type == TP_OPTIONS) set_option = FALSE;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_MAIN;
@@ -3836,13 +3837,13 @@ void do_menu_keymap_1p()
 
       clear_keybuf();
     }
-    else if ((key[KEY_ESC] || !get_key_okay()) && button[actual_button].state == ST_PRESSED && !lock_keyboard)
+    else if ((menu_esc || !get_key_okay()) && button[actual_button].state == ST_PRESSED && !lock_keyboard)
     {
       button[actual_button].state = ST_SELECTED;
       if (button[actual_button].type == TP_OPTIONS2) set_option = FALSE;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_OPTIONS;
@@ -4027,13 +4028,13 @@ void do_menu_keymap_2p()
 
       clear_keybuf();
     }
-    else if ((key[KEY_ESC] || !get_key_okay()) && (button[actual_button].state == ST_PRESSED) && !lock_keyboard)
+    else if ((menu_esc || !get_key_okay()) && (button[actual_button].state == ST_PRESSED) && !lock_keyboard)
     {
       button[actual_button].state = ST_SELECTED;
       if (button[actual_button].type == TP_OPTIONS2) set_option = FALSE;
       clear_keybuf();
     }
-    else if (key[KEY_ESC])
+    else if (menu_esc)
     {
        menu_change = TRUE;
        new_menu = MNU_KEYMAP_1P;
@@ -4104,6 +4105,7 @@ int show_menu()
   clear_keybuf();
 
   lock_keyboard = FALSE;
+  tap(KEY_ESC);   // an Esc still held from the game must not act in the menu
 
   switch (actual_menu)
   {
@@ -4167,6 +4169,7 @@ int show_menu()
 
       if (begin_play || quit_menu ) if (fade_out_active && (fade_type == 1)) if (fade_count >= fade_count_to) endthis = TRUE;
 
+      menu_esc = tap(KEY_ESC);
       menu_mouse();
       switch (actual_menu)
       {
@@ -4219,10 +4222,10 @@ int show_menu()
       if (menu_change)
         retval = move_menu();
 
-      if (key[KEY_F12]) { save_screen = TRUE; }
-      if (key[KEY_ESC] && actual_menu == MNU_MAIN) { quit_menu = TRUE; endthis = TRUE; }
+      if (tap(KEY_F12)) { save_screen = TRUE; }
+      if (menu_esc && actual_menu == MNU_MAIN) { quit_menu = TRUE; endthis = TRUE; }
       // fast exit (Shift+ESC)
-      if (key[KEY_ESC] && (key_shifts & KB_SHIFT_FLAG)) { quit_menu = TRUE; endthis = TRUE; }
+      if (menu_esc && (key_shifts & KB_SHIFT_FLAG)) { quit_menu = TRUE; endthis = TRUE; }
 
       if (retval && (new_menu != actual_menu))
       {
