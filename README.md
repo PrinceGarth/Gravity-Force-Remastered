@@ -18,10 +18,10 @@ The game runs in a 640x480 window.
 
 ## Windows
 
-Cross-built from Linux into one `gf.exe` (static Allegro 4.4.3.1 and libxmp, [llvm-mingw](https://github.com/mstorsjo/llvm-mingw)):
+Cross-built from Linux into one 32-bit `gf.exe` (static Allegro 4.4.3.1 and libxmp, [llvm-mingw](https://github.com/mstorsjo/llvm-mingw)):
 
 ```
-make -f Makefile.mingw CC=x86_64-w64-mingw32-clang WIN=<prefix holding the static libs>
+make -f Makefile.mingw CC=i686-w64-mingw32-clang WIN=<prefix holding the static libs>
 ```
 
 Put `gf.exe` next to `dat/`. The game always runs in a window and never changes the monitor's resolution. `gf.log` next to the exe collects error messages.

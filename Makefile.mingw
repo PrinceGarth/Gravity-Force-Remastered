@@ -2,7 +2,7 @@
 # Output: one gf.exe with no DLL dependencies beyond Windows' own.
 include Makefile.linux
 .DEFAULT_GOAL := gf.exe
-CC = x86_64-w64-mingw32-gcc
+CC = i686-w64-mingw32-gcc   # 32-bit: the 2000-era code crashes as 64-bit Windows (long is 32-bit there)
 WIN = win
 CFLAGS = -O2 -w -fcommon -Istubs -I$(WIN)/include -DALLEGRO_STATICLINK
 LIBS = -L$(WIN)/lib -lalleg -lxmp -ldinput -lddraw -ldxguid -ldsound -lwinmm -lole32 -lgdi32 -lcomdlg32 -luser32 -lkernel32 -lpthread
