@@ -72,6 +72,13 @@ void close_demo_file()
   demo_mode = 0;
 }
 
+static long ms(void)
+{
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return ts.tv_sec*1000L + ts.tv_nsec/1000000;
+}
+
 int getctrl(int c, int reset)
 {
   static int j0up = FALSE, j0down = FALSE, j0left = FALSE, j0right = FALSE,
@@ -82,7 +89,15 @@ int getctrl(int c, int reset)
   // c < 1000? keyboard
   if (c < 1000)
   {
-    if (key[c]) { if (reset) key[c] = 0; return 1; }
+    // reset: fire once per press, then repeat 10/s after 0.5s held
+    static long next[KEY_MAX];
+    long now;
+    if (!reset) return key[c] ? 1 : 0;
+    if (!key[c]) { next[c] = 0; return 0; }
+    now = ms();
+    if (next[c] && now < next[c]) return 0;
+    next[c] = now + (next[c] ? 100 : 500);
+    return 1;
   }
 
   // released Joystick buttons?
@@ -233,8 +248,33 @@ void choose_next_weapon(int c, int wnr)
 }
 
 
+// Mouse control: ship points at cursor, RMB thrust, LMB fire (single-player modes)
+int gf_mouse = 0;
+
+// Aim is armed 500ms after a right-click thrust; disarmed while landed or dead,
+// so a spawning or launching ship stays upright instead of tilting into the pad.
+static int mouse_ctrl(int c)
+{
+  static long armed[MAX_PLAYERS];
+  float sx, sy, a;
+
+  if (!gf_mouse || game_mode == MP_2PDOGFIGHT || lock_kb) return 0;
+  if (playship[c].land || playship[c].dead) { armed[c] = 0; return 1; }
+  if (!armed[c]) { if (!(mouse_b & 2)) return 1; armed[c] = ms() + 500; }
+  if (ms() < armed[c]) return 1;
+
+  // ship centre on screen (vscreen -> screen: minus scroll, plus play area offset)
+  sx = playship[c].xpos - map_x[1] - scroll_x[1] + PLAYSCREEN_XSTART + PLAYER_WIDTH/2.0;
+  sy = playship[c].ypos - map_y[1] - scroll_y[1] + PLAYSCREEN_YSTART + (show_panel ? USCORE_HEIGHT : 0) + PLAYER_HEIGHT/2.0;
+  a = atan2f(gf_mouse_x() - sx, sy - gf_mouse_y()) * 180.0 / M_PI;   // 0 = up, clockwise
+  if (a < 0) a += 360;
+  playship[c].head = a;
+  return 1;
+}
+
 void read_keys(int c)
 {
+  int mc;
   float scale_x,scale_y;
   float xp,yp,cx,cy;
   float xrot,yrot,angle;
@@ -263,11 +303,12 @@ void read_keys(int c)
   }
 
   if (keyboard_needs_poll()) poll_keyboard();
+  mc = mouse_ctrl(c);
 
   // thruster
  if (!playship[c].dead)
  {
-  if ( ((getctrl(pcontrol[c+km].thrust,0) && !lock_kb) || demo_read_code & 1) && (playship[c].fuel > 0) )
+  if ( ((getctrl(pcontrol[c+km].thrust,0) && !lock_kb) || (mc && (mouse_b & 2)) || demo_read_code & 1) && (playship[c].fuel > 0) )
   {
     demo_write_code |= 1;
 
@@ -329,7 +370,7 @@ void read_keys(int c)
   playship[c].shott++;
 
   // Schiessen
-  if (((getctrl(pcontrol[c+km].shoot,0) && !lock_kb) || (demo_read_code & 2)) && !playship_noweap)
+  if (((getctrl(pcontrol[c+km].shoot,0) && !lock_kb) || (mc && (mouse_b & 1)) || (demo_read_code & 2)) && !playship_noweap)
   {
     demo_write_code |= 2;
 
@@ -943,7 +984,7 @@ void check_collisions(BITMAP *scr, int c)
                                     break;
                   default         : if ((float)(playship[c].wght + base[nr].cargo * CARGO_WEIGHT) <= MAX_SHIP_WEIGHT)
                                     {
-                                      (float)playship[c].wght += base[nr].cargo * CARGO_WEIGHT;
+                                      playship[c].wght += base[nr].cargo * CARGO_WEIGHT;
                                       strcpy(tmpt,cargo_message[MSG_CARGO_CARGO1].text1);
                                       strcat(tmpt," (");
                                       sprintf(tmpt2,"%.0f",(float)(base[nr].cargo*(CARGO_WEIGHT*1000.0)));

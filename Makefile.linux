@@ -1,0 +1,7 @@
+CC = gcc
+CFLAGS = -O2 -g -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fno-stack-protector -w -fcommon -Istubs $(shell allegro-config --cflags)
+SRCS = gf.c gfcnfg.c gfcontrl.c gfdraw.c gfg2pdog.c gfgsngle.c gfgsrace.c gfinit.c gflevel.c gflinit.c gflink.c gflog.c gfmap.c gfmenu.c gfmes.c gfmisc.c gfnetw.c gfosd.c gfpal.c gfpanel.c gfrace.c gfsenm.c gfsobj.c gfsound.c gfspibul.c gfspln.c gfsprt.c gfstat.c mappyal.c gfscale.c gfmusic.c
+OBJS = $(SRCS:.c=.o)
+gf: $(OBJS)
+	$(CC) $(OBJS) $(shell allegro-config --libs) -l:libxmp.so.4 -lXrandr -lX11 -lm -o gf
+$(OBJS): $(wildcard *.h)

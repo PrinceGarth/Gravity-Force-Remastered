@@ -50,6 +50,9 @@ void read_message_file(int language_setting)
 //  strcpy(tmp_dir,lng_dir);
 //  f = fopen((char*)strcat(tmp_dir,"gf.lng"),"rt");
 
+  memset(error_message,0,sizeof(error_message)); memset(cargo_message,0,sizeof(cargo_message));
+  memset(mission_message,0,sizeof(mission_message)); memset(other_message,0,sizeof(other_message));
+  memset(menu_message,0,sizeof(menu_message)); memset(stat_message,0,sizeof(stat_message));
   packfile_password("tanja");
   sprintf(tmp_dir,"%s%s#%s",dat_dir,"gflng.dat","gf.lng");
   f = pack_fopen(tmp_dir,"r");
@@ -91,6 +94,7 @@ void read_message_file(int language_setting)
        {
          if (pos==0)
          {
+           number = -1;
            switch (mode)
            {
              case 1  :
@@ -317,7 +321,7 @@ void read_message_file(int language_setting)
                        break;
            } // switch mode
          } // pos==0
-         else if (pos > 0)
+         else if (pos > 0 && number >= 0)
          {
            if (strlen(tok) > 0)
            switch (mode)

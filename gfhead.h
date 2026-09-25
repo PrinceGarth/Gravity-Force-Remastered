@@ -20,6 +20,20 @@
 #include <jgmod.h>
 #include "allegttf.h"
 #include "gfd.h"
+#define fsin fixsin
+#define fcos fixcos
+#define fmul fixmul    // glibc 2.28+/2.35+ define float fmul/fsqrt; want Allegro 3 fixed-point
+#define fsqrt fixsqrt
+
+/* Linux port: scaled borderless fullscreen, see gfscale.c */
+int gf_set_gfx_mode(int card, int w, int h, int v_w, int v_h);
+int gf_mouse_x(void);
+int gf_mouse_y(void);
+#define set_gfx_mode gf_set_gfx_mode
+#undef SCREEN_W
+#undef SCREEN_H
+#define SCREEN_W (screen->w)
+#define SCREEN_H (screen->h)
 
 #ifdef ALLEGRO_WINDOWS
   #define srandom srand

@@ -4,8 +4,14 @@
  * Please read the readmeal.txt file and look at the examples
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <allegro.h>
+
+/* 64-bit port: BLKSTR/ANISTR keep 32-bit *offsets* (file layout); resolved on use */
+#define ANBLK(a) ((BLKSTR *)(mapblockstrpt + *(int32_t *)(mapanimstrendpt + (a)->ancuroff)))
+#define GFXBG(o) (mapblockgfxpt + (o))
+#define GFXFG(o) ((o) ? mapblockgfxpt + (o) : (char *)0)
 
 /* If you aren't using plain 'MapLoad', you can uncomment the
  * next line to remove a lot of code from your programme (about 20K from the exe ?)
@@ -37,9 +43,9 @@
 #define MapDraw15FG MapDraw16FG	/* Same thing */
 
 typedef struct {				/* Structure for data blocks */
-long int bgoff, fgoff;			/* offsets from start of graphic blocks */
-long int fgoff2, fgoff3; 		/* more overlay blocks */
-unsigned long int user1, user2;	/* user long data */
+int32_t bgoff, fgoff;			/* offsets from start of graphic blocks */
+int32_t fgoff2, fgoff3; 		/* more overlay blocks */
+uint32_t user1, user2;	/* user long data */
 unsigned short int user3, user4;	/* user short data */
 unsigned char user5, user6, user7;	/* user byte data */
 unsigned char tl : 1;				/* bits for collision detection */
@@ -57,14 +63,14 @@ signed char antype;	/* Type of anim, AN_? */
 signed char andelay;	/* Frames to go before next frame */
 signed char ancount;	/* Counter, decs each frame, till 0, then resets to andelay */
 signed char anuser;	/* User info */
-long int ancuroff;	/* Points to current offset in list */
-long int anstartoff;	/* Points to start of blkstr offsets list, AFTER ref. blkstr offset */
-long int anendoff;	/* Points to end of blkstr offsets list */
+int32_t ancuroff;	/* Points to current offset in list */
+int32_t anstartoff;	/* Points to start of blkstr offsets list, AFTER ref. blkstr offset */
+int32_t anendoff;	/* Points to end of blkstr offsets list */
 } ANISTR;
 
 typedef struct {			/* Generic structure for chunk headers */
 char id1, id2, id3, id4;	/* 4 byte header id. */
-long int headsize;		/* size of header chunk. */
+int32_t headsize;		/* size of header chunk. */
 } GENHEAD;
 
 typedef struct {		/* Map header structure */
@@ -133,7 +139,7 @@ ANISTR * myanpt;
 	}
 	if (*mymappt>=0) return (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-		return (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+		return ANBLK(myanpt); }
 }
 
 void MapSetBlock (int x, int y, int strvalue)
@@ -158,9 +164,9 @@ int MapChangeLayer (int newlyr)
 	return newlyr;
 }
 
-unsigned long int Mapbyteswapl (unsigned long int i)
+uint32_t Mapbyteswapl (uint32_t i)
 {
-unsigned long int j;
+uint32_t j;
 	j = 0; j = i&0xFF; j <<= 8; i >>= 8; j |= i&0xFF; j <<= 8; i >>= 8;
 	j |= i&0xFF; j <<= 8; i >>= 8; j |= i&0xFF; return j;
 }
@@ -244,17 +250,13 @@ int i, j, k;
 BLKSTR * myblkstrpt;
 ANISTR * myanpt;
 unsigned char * newgfxpt;
-long int * myanblkpt;
+int32_t * myanblkpt;
 
 	i = mapnumblockstr;
 	myblkstrpt = (BLKSTR *) mapblockstrpt;
 	if (!gfxinbitmaps) {
 	while (i)
 	{
-		myblkstrpt->bgoff += (long int) mapblockgfxpt;
-		if (myblkstrpt->fgoff!=0) myblkstrpt->fgoff += (long int) mapblockgfxpt;
-		if (myblkstrpt->fgoff2!=0) myblkstrpt->fgoff2 += (long int) mapblockgfxpt;
-		if (myblkstrpt->fgoff3!=0) myblkstrpt->fgoff3 += (long int) mapblockgfxpt;
 		myblkstrpt++; i--;
 	} } else {
 	i = 0; newgfxpt = mapblockgfxpt; while (i<mapnumblockgfx) {
@@ -294,13 +296,13 @@ long int * myanblkpt;
 		i++;
 	}
 	i = mapnumblockstr; while (i) {
-		((BITMAP *) myblkstrpt->bgoff) = abmTiles[(myblkstrpt->bgoff/(mapblockwidth*mapblockheight*((mapdepth+1)/8)))];
+		(void)0;
 		if (myblkstrpt->fgoff!=0)
-		((BITMAP *) myblkstrpt->fgoff) = abmTiles[(myblkstrpt->fgoff/(mapblockwidth*mapblockheight*((mapdepth+1)/8)))];
+		(void)0;
 		if (myblkstrpt->fgoff2!=0)
-	((BITMAP *) myblkstrpt->fgoff2) = abmTiles[(myblkstrpt->fgoff2/(mapblockwidth*mapblockheight*((mapdepth+1)/8)))];
+	(void)0;
 		if (myblkstrpt->fgoff3!=0)
-	((BITMAP *) myblkstrpt->fgoff3) = abmTiles[(myblkstrpt->fgoff3/(mapblockwidth*mapblockheight*((mapdepth+1)/8)))];
+	(void)0;
 	myblkstrpt++; i--;
 	}
 	}
@@ -309,16 +311,9 @@ long int * myanblkpt;
 	myanpt = (ANISTR *) mapanimstrendpt; myanpt--;
 	while (myanpt->antype!=AN_END)
 	{
-		myanpt->anstartoff += (long int) mapanimstrendpt;
-		myanpt->anendoff += (long int) mapanimstrendpt;
-		myanpt->ancuroff += (long int) mapanimstrendpt;
 		myanpt--;
 	}
-	myanblkpt = (long int *) mapanimstrpt; while (myanblkpt != (long int *) myanpt)
-	{
-		*myanblkpt += (long int) mapblockstrpt;
-		myanblkpt++;
-	} }
+	}
 	return 0;
 }
 
@@ -554,7 +549,7 @@ char * mynllpt;
 int MapRealLoad (char * mapname)
 {
 int i;
-long int mapfilesize, mapbytesread;
+int32_t mapfilesize, mapbytesread;
 //char debugtxt[80];
 
 	abmTiles[0] = NULL;
@@ -665,7 +660,7 @@ int MapMemDecodeCMAP (unsigned char * cmppt)
 {
 int i;
 unsigned char * tempcmappt;
-	mapcmappt = (unsigned char *) malloc (Mapbyteswapl(*(long int *)cmppt));
+	mapcmappt = (unsigned char *) malloc (Mapbyteswapl(*(int32_t *)cmppt));
 	if (mapcmappt==NULL) { maperror = MER_OUTOFMEM; return -1; }
 	cmppt += 4;
 	tempcmappt = mapcmappt;
@@ -679,7 +674,7 @@ int MapMemDecodeBKDT (unsigned char * mapmempt)
 {
 int i, j;
 unsigned char * temppt;
-	i = Mapbyteswapl(*(long int *)mapmempt);
+	i = Mapbyteswapl(*(int32_t *)mapmempt);
 	mapmempt += 4;
 	mapblockstrpt = malloc (i);
 	if (mapblockstrpt==NULL) { maperror = MER_OUTOFMEM; return -1; }
@@ -693,7 +688,7 @@ int MapMemDecodeANDT (unsigned char * mapmempt)
 {
 int i, j;
 unsigned char * temppt;
-	i = Mapbyteswapl(*(long int *)mapmempt);
+	i = Mapbyteswapl(*(int32_t *)mapmempt);
 	mapmempt += 4;
 	mapanimstrpt = malloc (i);
 	if (mapanimstrpt==NULL) { maperror = MER_OUTOFMEM; return -1; }
@@ -708,7 +703,7 @@ int MapMemDecodeBGFX (unsigned char * mapmempt)
 {
 int i, j;
 unsigned char * temppt;
-	i = Mapbyteswapl(*(long int *)mapmempt);
+	i = Mapbyteswapl(*(int32_t *)mapmempt);
 	mapmempt += 4;
 	mapblockgfxpt = malloc (i);
 	if (mapblockgfxpt==NULL) { maperror = MER_OUTOFMEM; return -1; }
@@ -721,7 +716,7 @@ int MapMemDecodeBODY (unsigned char * mapmempt)
 {
 int i, j;
 unsigned char * temppt;
-	i = Mapbyteswapl(*(long int *)mapmempt);
+	i = Mapbyteswapl(*(int32_t *)mapmempt);
 	mapmempt += 4;
 	mappt = malloc (i);
 	if (mappt==NULL) { maperror = MER_OUTOFMEM; return -1; }
@@ -734,7 +729,7 @@ int MapMemDecodeLYR (unsigned char * mapmempt, int maplayernum)
 {
 int i, j;
 unsigned char * temppt;
-	i = Mapbyteswapl(*(long int *)mapmempt);
+	i = Mapbyteswapl(*(int32_t *)mapmempt);
 	mapmempt += 4;
 	mapmappt[maplayernum] = malloc (i);
 	if (mapmappt[maplayernum]==NULL) { maperror = MER_OUTOFMEM; return -1; }
@@ -746,7 +741,7 @@ unsigned char * temppt;
 int MapRealDecode (unsigned char * mapmempt)
 {
 int i;
-long int maplength;
+int32_t maplength;
 
 	MapFreeMem ();
 	maperror = 0;
@@ -756,7 +751,7 @@ long int maplength;
 	if (*(mapmempt+2)!='R') maperror = MER_MAPLOADERROR;
 	if (*(mapmempt+3)!='M') maperror = MER_MAPLOADERROR;
 	mapmempt += 4;
-	maplength = (Mapbyteswapl(*(long int *)mapmempt)+8);
+	maplength = (Mapbyteswapl(*(int32_t *)mapmempt)+8);
 
 	if (maperror) return -1;
 	mapmempt += 4;
@@ -798,8 +793,8 @@ long int maplength;
 		if ((*mapmempt=='L') && (*(mapmempt+1)=='Y') && (*(mapmempt+2)=='R') &&
 		(*(mapmempt+3)=='7')) MapMemDecodeLYR (mapmempt+4, 7);
 		if (maperror) return -1;
-		mapmempt += 4; i += Mapbyteswapl(*(long int *)mapmempt)+8;
-		mapmempt += Mapbyteswapl(*(long int *)mapmempt); mapmempt += 4;
+		mapmempt += 4; i += Mapbyteswapl(*(int32_t *)mapmempt)+8;
+		mapmempt += Mapbyteswapl(*(int32_t *)mapmempt); mapmempt += 4;
 	}
 	i = MapRelocate ();
 	return i;
@@ -966,7 +961,7 @@ ANISTR * myanpt;
 		while (i < (mapx+mapw)) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-				blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+				blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
 				blit (parbm, mapdestpt, paraxo, parayo, i, j, mapblockwidth, mapblockheight);
 			paraxo += mapblockwidth;
@@ -1013,8 +1008,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=maphclip;k<mapblockwidth;k++) {
@@ -1032,8 +1027,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=0;k<mapblockwidth;k++) {
@@ -1051,8 +1046,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
 	for (l=0;l<(mapblockheight-mapvclip);l++) { 
@@ -1071,8 +1066,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;(l+j)<(mapy+maph);l++) { 
 		maplinecpypt = (unsigned char *) mapdestpt->line[(l+j)] + i;
@@ -1092,8 +1087,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) {
 		maplinecpypt = (unsigned char *) mapdestpt->line[(l+j)] + i;
@@ -1134,8 +1129,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned char *) mapblockgfxpt) { 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1154,8 +1149,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned char *) mapblockgfxpt) { 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1174,8 +1169,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
 	if (mapgfxpt!= (unsigned char *) mapblockgfxpt) { 
@@ -1196,8 +1191,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned char *) mapblockgfxpt) { 
 	for (l=0;(l+j)<(mapy+maph);l++) { 
@@ -1219,8 +1214,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned char *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned char *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned char *) mapblockgfxpt) { for (l=0;l<mapblockheight;l++) {
 		maplinecpypt = (unsigned char *) mapdestpt->line[(l+j)] + i;
@@ -1262,10 +1257,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned char *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned char *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned char *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1284,10 +1279,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned char *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned char *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned char *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1306,10 +1301,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned char *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned char *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned char *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	mapgfxpt += mapblockwidth*mapvclip;
@@ -1330,10 +1325,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned char *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned char *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned char *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;(l+j)<(mapy+maph);l++) { 
@@ -1355,10 +1350,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned char *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned char *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned char *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned char *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) {
@@ -1400,8 +1395,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=maphclip;k<mapblockwidth;k++) {
@@ -1419,8 +1414,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=0;k<mapblockwidth;k++) {
@@ -1438,8 +1433,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
 	for (l=0;l<(mapblockheight-mapvclip);l++) { 
@@ -1458,8 +1453,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;(l+j)<(mapy+maph);l++) { 
 		maplinecpypt = ((unsigned short int *) mapdestpt->line[(l+j)]) + i;
@@ -1479,8 +1474,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) {
 		maplinecpypt = ((unsigned short int *) mapdestpt->line[(l+j)]) + i;
@@ -1523,8 +1518,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned short int *) mapblockgfxpt) { 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1544,8 +1539,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned short int *) mapblockgfxpt) { 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1565,8 +1560,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
 	if (mapgfxpt!= (unsigned short int *) mapblockgfxpt) { 
@@ -1588,8 +1583,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned short int *) mapblockgfxpt) { 
 	for (l=0;(l+j)<(mapy+maph);l++) { 
@@ -1612,8 +1607,8 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned short int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (unsigned short int *) GFXBG(blkdatapt->bgoff);
 
 	if (mapgfxpt!= (unsigned short int *) mapblockgfxpt) { 
 	for (l=0;l<mapblockheight;l++) {
@@ -1659,10 +1654,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned short int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned short int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned short int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1682,10 +1677,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned short int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned short int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned short int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
@@ -1705,10 +1700,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned short int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned short int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned short int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	mapgfxpt += mapblockwidth*mapvclip;
@@ -1730,10 +1725,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned short int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned short int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned short int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;(l+j)<(mapy+maph);l++) { 
@@ -1756,10 +1751,10 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned short int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned short int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned short int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (unsigned short int *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) {
@@ -1785,10 +1780,10 @@ void MapDraw32BG (BITMAP * mapdestpt, int mapxo, int mapyo, int mapx, int mapy,
 int i, j, k, l, mapvclip, maphclip, mapxblks, mapx2blks, mapyblks;
 short int *mymappt;
 short int *mymap2pt;
-unsigned long int * maplinecpypt;
+uint32_t * maplinecpypt;
 /* short int *mymap2pt;
 unsigned char * srcpt;
-*/ unsigned long int * mapgfxpt;
+*/ uint32_t * mapgfxpt;
 BLKSTR *blkdatapt;
 ANISTR *myanpt;
 
@@ -1802,12 +1797,12 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=maphclip;k<mapblockwidth;k++) {
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -1821,13 +1816,13 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=0;k<mapblockwidth;k++) {
 		if ((k+i)>=(mapx+mapw)) break;
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -1840,12 +1835,12 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
 	for (l=0;l<(mapblockheight-mapvclip);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		memcpy (maplinecpypt, mapgfxpt, mapblockwidth*4); mapgfxpt += mapblockwidth; }
 	i += mapblockwidth; mymappt++; }
 
@@ -1860,11 +1855,11 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;(l+j)<(mapy+maph);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		memcpy (maplinecpypt, mapgfxpt, mapblockwidth*4); mapgfxpt += mapblockwidth; }
 	i += mapblockwidth; mymappt++; }
 
@@ -1881,11 +1876,11 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
 	for (l=0;l<mapblockheight;l++) {
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		memcpy (maplinecpypt, mapgfxpt, mapblockwidth*4); mapgfxpt += mapblockwidth; }
 	i += mapblockwidth; mymappt++; mapxblks--; }
 	j += mapblockheight; mymappt = mymap2pt+mapwidth; mapyblks--; }
@@ -1906,10 +1901,10 @@ void MapDraw32BGT (BITMAP * mapdestpt, int mapxo, int mapyo, int mapx, int mapy,
 int i, j, k, l, mapvclip, maphclip, mapxblks, mapx2blks, mapyblks;
 short int *mymappt;
 short int *mymap2pt;
-unsigned long int * maplinecpypt;
+uint32_t * maplinecpypt;
 /* short int *mymap2pt;
 unsigned char * srcpt;
-*/ unsigned long int * mapgfxpt;
+*/ uint32_t * mapgfxpt;
 BLKSTR *blkdatapt;
 ANISTR *myanpt;
 
@@ -1923,14 +1918,14 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
-	if (mapgfxpt != (unsigned long int *) mapblockgfxpt) {
+	if (mapgfxpt != (uint32_t *) mapblockgfxpt) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=maphclip;k<mapblockwidth;k++) {
 		if (mapgfxpt[k] == 0xFF00FF)
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; } }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -1944,15 +1939,15 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
-	if (mapgfxpt != (unsigned long int *) mapblockgfxpt) {
+	if (mapgfxpt != (uint32_t *) mapblockgfxpt) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=0;k<mapblockwidth;k++) {
 		if ((k+i)>=(mapx+mapw)) break;
 		if (mapgfxpt[k] == 0xFF00FF)
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; } }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -1965,13 +1960,13 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 	mapgfxpt += mapblockwidth*mapvclip;
 
-	if (mapgfxpt != (unsigned long int *) mapblockgfxpt) {
+	if (mapgfxpt != (uint32_t *) mapblockgfxpt) {
 	for (l=0;l<(mapblockheight-mapvclip);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 		if (*maplinecpypt == 0xFF00FF)
 		*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -1988,12 +1983,12 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
-	if (mapgfxpt != (unsigned long int *) mapblockgfxpt) {
+	if (mapgfxpt != (uint32_t *) mapblockgfxpt) {
 	for (l=0;(l+j)<(mapy+maph);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 		if (*maplinecpypt == 0xFF00FF)
 		*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -2012,12 +2007,12 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	mapgfxpt = (unsigned long int *) blkdatapt->bgoff;
+	blkdatapt = ANBLK(myanpt); }
+	mapgfxpt = (uint32_t *) GFXBG(blkdatapt->bgoff);
 
-	if (mapgfxpt != (unsigned long int *) mapblockgfxpt) {
+	if (mapgfxpt != (uint32_t *) mapblockgfxpt) {
 	for (l=0;l<mapblockheight;l++) {
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 			if (*maplinecpypt == 0xFF00FF)
 			*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -2039,10 +2034,10 @@ void MapDraw32FG (BITMAP * mapdestpt, int mapxo, int mapyo, int mapx, int mapy,
 int i, j, k, l, mapvclip, maphclip, mapxblks, mapx2blks, mapyblks;
 short int *mymappt;
 short int *mymap2pt;
-unsigned long int * maplinecpypt;
+uint32_t * maplinecpypt;
 /* short int *mymap2pt;
 unsigned char * srcpt;
-*/ unsigned long int * mapgfxpt;
+*/ uint32_t * mapgfxpt;
 BLKSTR *blkdatapt;
 ANISTR *myanpt;
 
@@ -2057,16 +2052,16 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned long int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned long int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned long int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=maphclip;k<mapblockwidth;k++) {
 		if (mapgfxpt[k] != 0xFF00FF) 
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; } }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -2080,17 +2075,17 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned long int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned long int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned long int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) { if (((l+j)>=mapy) && ((l+j)<(mapy+maph))) {
 		for (k=0;k<mapblockwidth;k++) {
 		if ((k+i)>=(mapx+mapw)) break;
 		if (mapgfxpt[k] != 0xFF00FF)
-		((unsigned long int *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
+		((uint32_t *)mapdestpt->line[(l+j)])[(k+i)] = mapgfxpt[k]; } }
 		mapgfxpt += mapblockwidth; } }
 	j += mapblockheight; mymappt += mapwidth; }
 
@@ -2103,15 +2098,15 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned long int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned long int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned long int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	mapgfxpt += mapblockwidth*mapvclip;
 	for (l=0;l<(mapblockheight-mapvclip);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 		if (*mapgfxpt != 0xFF00FF)
 			*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -2128,14 +2123,14 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned long int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned long int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned long int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;(l+j)<(mapy+maph);l++) { 
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 		if (*mapgfxpt != 0xFF00FF)
 			*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -2154,14 +2149,14 @@ ANISTR *myanpt;
 	{
 	if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 	else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-	blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-	if (!mapfg) mapgfxpt = (unsigned long int *) blkdatapt->fgoff;
-	else if (mapfg == 1) mapgfxpt = (unsigned long int *) blkdatapt->fgoff2;
-	else mapgfxpt = (unsigned long int *) blkdatapt->fgoff3;
+	blkdatapt = ANBLK(myanpt); }
+	if (!mapfg) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff);
+	else if (mapfg == 1) mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff2);
+	else mapgfxpt = (uint32_t *) GFXFG(blkdatapt->fgoff3);
 
 	if (mapgfxpt != NULL) {
 	for (l=0;l<mapblockheight;l++) {
-		maplinecpypt = ((unsigned long int *) mapdestpt->line[(l+j)]) + i;
+		maplinecpypt = ((uint32_t *) mapdestpt->line[(l+j)]) + i;
 		for (k=0;k<mapblockwidth;k++) {
 		if (*mapgfxpt != 0xFF00FF)
 			*maplinecpypt = *mapgfxpt; maplinecpypt++; mapgfxpt++; } } }
@@ -2210,32 +2205,32 @@ ANISTR *myanpt;
 		for (j=(mapy-mapvclip);j<((mapy+maph)-mapblockheight);j+=mapblockheight) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+			blkdatapt = ANBLK(myanpt); }
+			blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt += mapwidth;
 		}
 /* Draw bottom clipped row */
 		for (;i<((mapx+mapw)-mapblockwidth);i+=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+			blkdatapt = ANBLK(myanpt); }
+			blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt ++;
 		}
 /* Draw right clipped column */
 		for (;j>(mapy-mapvclip);j-=mapblockheight) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+			blkdatapt = ANBLK(myanpt); }
+			blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt -= mapwidth;
 		}
 /* Draw top clipped row */
 		for (;i>(mapx-maphclip);i-=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+			blkdatapt = ANBLK(myanpt); }
+			blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt--;
 		}
 /* Draw unclipped blocks */
@@ -2246,8 +2241,8 @@ ANISTR *myanpt;
 		for (i=((mapx-maphclip)+mapblockwidth);i<((mapx+mapw)-mapblockwidth);i+=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+			blkdatapt = ANBLK(myanpt); }
+			blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt++;
 		}
 		mymap2pt += mapwidth; mymappt = mymap2pt;
@@ -2296,44 +2291,44 @@ ANISTR *myanpt;
 		for (j=(mapy-mapvclip);j<((mapy+maph)-mapblockheight);j+=mapblockheight) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+			blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
-				masked_blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				masked_blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			else
-				blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt += mapwidth;
 		}
 /* Draw bottom clipped row */
 		for (;i<((mapx+mapw)-mapblockwidth);i+=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+			blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
-				masked_blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				masked_blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			else
-				blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt ++;
 		}
 /* Draw right clipped column */
 		for (;j>(mapy-mapvclip);j-=mapblockheight) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+			blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
-				masked_blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				masked_blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			else
-				blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt -= mapwidth;
 		}
 /* Draw top clipped row */
 		for (;i>(mapx-maphclip);i-=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+			blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
-				masked_blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				masked_blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			else
-				blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt--;
 		}
 /* Draw unclipped blocks */
@@ -2344,11 +2339,11 @@ ANISTR *myanpt;
 		for (i=((mapx-maphclip)+mapblockwidth);i<((mapx+mapw)-mapblockwidth);i+=mapblockwidth) {
 			if (*mymappt>=0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
+			blkdatapt = ANBLK(myanpt); }
 			if (blkdatapt->trigger)
-				masked_blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				masked_blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			else
-				blit ((BITMAP *) blkdatapt->bgoff, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
+				blit ((BITMAP *) GFXBG(blkdatapt->bgoff), mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 			mymappt++;
 		}
 		mymap2pt += mapwidth; mymappt = mymap2pt;
@@ -2398,11 +2393,11 @@ BITMAP *mapgfxpt;
 		if (*mymappt) {
 			if (*mymappt>0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			if (!mapfg) mapgfxpt = (BITMAP *) blkdatapt->fgoff;
-			else if (mapfg == 1) mapgfxpt = (BITMAP *) blkdatapt->fgoff2;
-			else mapgfxpt = (BITMAP *) blkdatapt->fgoff3;
-			if (((long int) mapgfxpt)!=0)
+			blkdatapt = ANBLK(myanpt); }
+			if (!mapfg) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff;
+			else if (mapfg == 1) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff2;
+			else mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff3;
+			if (((intptr_t) mapgfxpt)!=0)
 			masked_blit (mapgfxpt, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 		}
 			mymappt += mapwidth;
@@ -2412,11 +2407,11 @@ BITMAP *mapgfxpt;
 		if (*mymappt) {
 			if (*mymappt>0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			if (!mapfg) mapgfxpt = (BITMAP *) blkdatapt->fgoff;
-			else if (mapfg == 1) mapgfxpt = (BITMAP *) blkdatapt->fgoff2;
-			else mapgfxpt = (BITMAP *) blkdatapt->fgoff3;
-			if (((long int) mapgfxpt)!=0)
+			blkdatapt = ANBLK(myanpt); }
+			if (!mapfg) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff;
+			else if (mapfg == 1) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff2;
+			else mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff3;
+			if (((intptr_t) mapgfxpt)!=0)
 			masked_blit (mapgfxpt, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 		}
 			mymappt ++;
@@ -2426,11 +2421,11 @@ BITMAP *mapgfxpt;
 		if (*mymappt) {
 			if (*mymappt>0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			if (!mapfg) mapgfxpt = (BITMAP *) blkdatapt->fgoff;
-			else if (mapfg == 1) mapgfxpt = (BITMAP *) blkdatapt->fgoff2;
-			else mapgfxpt = (BITMAP *) blkdatapt->fgoff3;
-			if (((long int) mapgfxpt)!=0)
+			blkdatapt = ANBLK(myanpt); }
+			if (!mapfg) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff;
+			else if (mapfg == 1) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff2;
+			else mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff3;
+			if (((intptr_t) mapgfxpt)!=0)
 			masked_blit (mapgfxpt, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 		}
 			mymappt -= mapwidth;
@@ -2440,11 +2435,11 @@ BITMAP *mapgfxpt;
 		if (*mymappt) {
 			if (*mymappt>0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			if (!mapfg) mapgfxpt = (BITMAP *) blkdatapt->fgoff;
-			else if (mapfg == 1) mapgfxpt = (BITMAP *) blkdatapt->fgoff2;
-			else mapgfxpt = (BITMAP *) blkdatapt->fgoff3;
-			if (((long int) mapgfxpt)!=0)
+			blkdatapt = ANBLK(myanpt); }
+			if (!mapfg) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff;
+			else if (mapfg == 1) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff2;
+			else mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff3;
+			if (((intptr_t) mapgfxpt)!=0)
 			masked_blit (mapgfxpt, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 		}
 			mymappt--;
@@ -2458,11 +2453,11 @@ BITMAP *mapgfxpt;
 		if (*mymappt) {
 			if (*mymappt>0) blkdatapt = (BLKSTR*) (((char *)mapblockstrpt) + *mymappt);
 			else { myanpt = (ANISTR *) (mapanimstrendpt + *mymappt);
-			blkdatapt = (BLKSTR *) *((long int *)(myanpt->ancuroff)); }
-			if (!mapfg) mapgfxpt = (BITMAP *) blkdatapt->fgoff;
-			else if (mapfg == 1) mapgfxpt = (BITMAP *) blkdatapt->fgoff2;
-			else mapgfxpt = (BITMAP *) blkdatapt->fgoff3;
-			if (((long int) mapgfxpt)!=0)
+			blkdatapt = ANBLK(myanpt); }
+			if (!mapfg) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff;
+			else if (mapfg == 1) mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff2;
+			else mapgfxpt = (BITMAP *)(intptr_t) blkdatapt->fgoff3;
+			if (((intptr_t) mapgfxpt)!=0)
 			masked_blit (mapgfxpt, mapdestpt, 0, 0, i, j, mapblockwidth, mapblockheight);
 		}
 		mymappt++;

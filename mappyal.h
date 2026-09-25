@@ -1,6 +1,7 @@
 /* Header file for mappyAL V0.?? */
 /* (C)2000 Robin Burrows  -  rburrows@bigfoot.com */
 
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,9 +31,9 @@ extern "C" {
 #define MapDraw15FG MapDraw16FG /* Same thing */
 
 typedef struct {                                /* Structure for data blocks */
-long int bgoff, fgoff;                  /* offsets from start of graphic blocks */
-long int fgoff2, fgoff3;                /* more overlay blocks */
-unsigned long int user1, user2; /* user long data */
+int32_t bgoff, fgoff;                  /* offsets from start of graphic blocks */
+int32_t fgoff2, fgoff3;                /* more overlay blocks */
+uint32_t user1, user2; /* user long data */
 unsigned short int user3, user4;        /* user short data */
 unsigned char user5, user6, user7;      /* user byte data */
 unsigned char tl : 1;                           /* bits for collision detection */
@@ -50,14 +51,14 @@ signed char antype;     /* Type of anim, AN_? */
 signed char andelay;    /* Frames to go before next frame */
 signed char ancount;    /* Counter, decs each frame, till 0, then resets to andelay */
 signed char anuser;     /* User info */
-long int ancuroff;      /* Points to current offset in list */
-long int anstartoff;    /* Points to start of blkstr offsets list, AFTER ref. blkstr offset */
-long int anendoff;      /* Points to end of blkstr offsets list */
+int32_t ancuroff;      /* Points to current offset in list */
+int32_t anstartoff;    /* Points to start of blkstr offsets list, AFTER ref. blkstr offset */
+int32_t anendoff;      /* Points to end of blkstr offsets list */
 } ANISTR;
 
 typedef struct {                        /* Generic structure for chunk headers */
 char id1, id2, id3, id4;        /* 4 byte header id. */
-long int headsize;              /* size of header chunk. */
+int32_t headsize;              /* size of header chunk. */
 } GENHEAD;
 
 typedef struct {                /* Map header structure */
@@ -95,7 +96,7 @@ extern short int ** mapmaparraypt[8];
 extern BITMAP * abmTiles[1024];
 /* End of Mappy globals */
 
-unsigned long int Mapbyteswapl (unsigned long int i);
+uint32_t Mapbyteswapl (uint32_t i);
 void Mapconv8to6pal (unsigned char * palpt);
 void MapFreeMem (void);
 void MapSetPal8 (void);

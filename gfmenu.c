@@ -386,8 +386,8 @@ void init_menu_sounds()
   reserve_voices(8,-1);
   if (install_sound(DIGI_AUTODETECT, MIDI_NONE, ""))
   {
-    allegro_message("%s %s\n",error_message[MSG_ERROR_SOUND_INIT].text1,allegro_error);
-    allegro_message("%s \n",error_message[MSG_ERROR_SOUND_INIT2].text1);
+    fprintf(stderr,"%s %s\n",error_message[MSG_ERROR_SOUND_INIT].text1,allegro_error);
+    fprintf(stderr,"%s \n",error_message[MSG_ERROR_SOUND_INIT2].text1);
     play_sound = FALSE;
   }
   else
@@ -407,7 +407,27 @@ void init_menu_sounds()
 }
 
 
-void init_menu()
+static void menu_mouse(void)
+{
+  extern int gf_mouse;
+  static int lx = -1, ly = -1, lb = 0, injected = FALSE;
+  int nr, mx = gf_mouse_x(), my = gf_mouse_y(), b = mouse_b & 1;
+
+  if (injected) { key[KEY_ENTER] = 0; injected = FALSE; }
+  if (lx < 0) { lx = gf_mouse_x(); ly = gf_mouse_y(); }   // resting cursor must not steal the selection
+  if (!gf_mouse) return;
+  for (nr = 0; nr < button_anz; nr++)
+    if (button[nr].state != ST_DEACTIVATED &&
+        mx >= button[nr].x && mx < button[nr].x + button[nr].w &&
+        my >= button[nr].y && my < button[nr].y + button[nr].h)
+    {
+      if (mx != lx || my != ly) actual_button = nr;
+      if (b && !lb && actual_button == nr) { key[KEY_ENTER] = 1; injected = TRUE; }
+    }
+  lx = mx; ly = my; lb = b;
+}
+
+void gf_init_menu()
 {
 //  read_message_file(LANGUAGE);
 /*
@@ -418,7 +438,8 @@ void init_menu()
   }
   install_timer();
   install_keyboard();
-  if (set_gfx_mode(GFX_AUTODETECT,640,480,0,0))
+  { extern int gf_mouse; gf_mouse = (install_mouse() >= 0); }
+  if (set_gfx_mode(GFX_AUTODETECT_WINDOWED,640,480,0,0))
   {
     printf("%s %s\n",error_message[MSG_ERROR_GRAPHIC_INIT].text1,allegro_error);
     exit(47);
@@ -2285,7 +2306,7 @@ void do_menu_main()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2298,7 +2319,7 @@ void do_menu_main()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2369,7 +2390,7 @@ void do_menu_sp_sel()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2382,7 +2403,7 @@ void do_menu_sp_sel()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2458,7 +2479,7 @@ void do_menu_splayer()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard)
     {
       do
       {
@@ -2468,7 +2489,7 @@ void do_menu_splayer()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard)
     {
       do
       {
@@ -2478,7 +2499,7 @@ void do_menu_splayer()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -2501,7 +2522,7 @@ void do_menu_splayer()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -2613,7 +2634,7 @@ void do_menu_mp_sel()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2626,7 +2647,7 @@ void do_menu_mp_sel()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2702,7 +2723,7 @@ void do_menu_sp_race()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2715,7 +2736,7 @@ void do_menu_sp_race()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2728,7 +2749,7 @@ void do_menu_sp_race()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -2750,7 +2771,7 @@ void do_menu_sp_race()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -2850,7 +2871,7 @@ void do_menu_mp_race()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2863,7 +2884,7 @@ void do_menu_mp_race()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2920,7 +2941,7 @@ void do_menu_dogfight()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2933,7 +2954,7 @@ void do_menu_dogfight()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -2990,7 +3011,7 @@ void do_menu_qdogfight()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu && !set_option)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu && !set_option)
     {
       do
       {
@@ -3003,7 +3024,7 @@ void do_menu_qdogfight()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu && !set_option)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu && !set_option)
     {
       do
       {
@@ -3016,7 +3037,7 @@ void do_menu_qdogfight()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
     {
       if (actual_button == 0 && !set_option)
       {
@@ -3093,7 +3114,7 @@ void do_menu_qdogfight()
 
       clear_keybuf();
     }
-    else if ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
     {
       if (actual_button == 0  && !set_option)
       {
@@ -3245,7 +3266,7 @@ void do_menu_sp_training()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -3258,7 +3279,7 @@ void do_menu_sp_training()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !quit_menu)
     {
       do
       {
@@ -3271,7 +3292,7 @@ void do_menu_sp_training()
       play_sound_sample(snd_menu_change,1000,0,0,0,100);
       clear_keybuf();
     }
-    else if ((getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -3291,7 +3312,7 @@ void do_menu_sp_training()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) && !lock_keyboard)
     {
       if (actual_button == 0)
       {
@@ -3369,7 +3390,7 @@ void do_menu_options()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard)
     {
       if (!set_option)
       {
@@ -3390,7 +3411,7 @@ void do_menu_options()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard)
     {
       if (!set_option)
       {
@@ -3411,7 +3432,7 @@ void do_menu_options()
       }
       clear_keybuf();
     }
-    else if (((getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1)) || (getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1))) && !lock_keyboard)
+    else if (((getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1)) || (getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1))) && !lock_keyboard)
     {
       if (!set_option)
       {
@@ -3604,7 +3625,7 @@ void do_menu_keymap_1p()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !set_option)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !set_option)
     {
       if (!set_option)
       {
@@ -3625,7 +3646,7 @@ void do_menu_keymap_1p()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !set_option)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !set_option)
     {
       if (!set_option)
       {
@@ -3669,7 +3690,7 @@ void do_menu_keymap_1p()
              (key_shifts & KB_ALT_FLAG)) && !lock_keyboard && !key[KEY_ESC]
              && get_key_okay())
     {
-      if (!set_option && ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) || (getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1))))
+      if (!set_option && ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) || (getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1))))
       {
         play_sound_sample(snd_menu_change,1000,0,0,0,100);
         switch (actual_button)
@@ -3799,7 +3820,7 @@ void do_menu_keymap_2p()
   if (!menu_change)
   {
 
-    if ((getctrl(KEY_DOWN,0) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !set_option)
+    if ((getctrl(KEY_DOWN,1) || getctrl(JOY0_DOWN,1)) && !lock_keyboard && !set_option)
     {
       if (!set_option)
       {
@@ -3818,7 +3839,7 @@ void do_menu_keymap_2p()
       }
       clear_keybuf();
     }
-    else if ((getctrl(KEY_UP,0) || getctrl(JOY0_UP,1)) && !lock_keyboard && !set_option)
+    else if ((getctrl(KEY_UP,1) || getctrl(JOY0_UP,1)) && !lock_keyboard && !set_option)
     {
       if (!set_option)
       {
@@ -3860,7 +3881,7 @@ void do_menu_keymap_2p()
              (key_shifts & KB_ALT_FLAG)) && !lock_keyboard && !key[KEY_ESC]
              && get_key_okay())
     {
-      if (!set_option && ((getctrl(KEY_LEFT,0) || getctrl(JOY0_LEFT,1)) || (getctrl(KEY_RIGHT,0) || getctrl(JOY0_RIGHT,1))))
+      if (!set_option && ((getctrl(KEY_LEFT,1) || getctrl(JOY0_LEFT,1)) || (getctrl(KEY_RIGHT,1) || getctrl(JOY0_RIGHT,1))))
       {
         play_sound_sample(snd_menu_change,1000,0,0,0,100);
         switch (actual_button)
@@ -3986,7 +4007,7 @@ int show_menu()
   int update_graphics=FALSE;
   static int endthis=FALSE;
 
-  init_menu();
+  gf_init_menu();
   playship[0].xpos = playship[0].ypos = 0;
 
   LOCK_VARIABLE(mgame_time);
@@ -4070,6 +4091,7 @@ int show_menu()
 
       if (begin_play || quit_menu ) if (fade_out_active && (fade_type == 1)) if (fade_count >= fade_count_to) endthis = TRUE;
 
+      menu_mouse();
       switch (actual_menu)
       {
         case MNU_MAIN :

@@ -9,6 +9,8 @@
  *    see source.txt for further information
  */
 
+#include <unistd.h>
+#include <limits.h>
 #include "gfhead.h"
 #include "gflink.h"
 #include "gfinit.h"
@@ -27,6 +29,12 @@ int main(int argc, char *argv[])
   int weiter=TRUE;
   extern int actual_menu;
   extern int level_end;
+
+  {
+    // data paths are relative ("./dat/"): run from the exe's directory
+    char exe[PATH_MAX]; ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe)-1);
+    if (n > 0) { exe[n] = 0; *strrchr(exe,'/') = 0; if (chdir(exe)) perror("chdir"); }
+  }
 
   gpause = FALSE;
 

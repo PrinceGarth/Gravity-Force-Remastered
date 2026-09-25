@@ -159,7 +159,7 @@ void init_colors()
   col_bred      = makecol8(255,255,0);
   col_green     = makecol8(0,255,0);
   col_blue      = makecol8(0,0,255);
-  col_black     = makecol8(0,0,0);
+  col_black     = 0;  // background index; collision treats >0 as solid (makecol8 never returns 0 in Allegro 4)
   col_white     = makecol8(255,255,255);
   col_yellow    = makecol8(255,255,0);
   col_orange    = makecol8(255,128,0);
@@ -335,8 +335,8 @@ void init_sounds()
   reserve_voices(15,-1);
   if (install_sound(DIGI_AUTODETECT, MIDI_NONE, ""))
   {
-    allegro_message("%s %s\n",error_message[MSG_ERROR_SOUND_INIT].text1,allegro_error);
-    allegro_message("%s \n",error_message[MSG_ERROR_SOUND_INIT2].text1);
+    fprintf(stderr,"%s %s\n",error_message[MSG_ERROR_SOUND_INIT].text1,allegro_error);
+    fprintf(stderr,"%s \n",error_message[MSG_ERROR_SOUND_INIT2].text1);
     play_sound = FALSE;
   }
   else
@@ -520,6 +520,7 @@ void init_first()
   allegro_init();
   install_timer();
   install_keyboard();
+  { extern int gf_mouse; gf_mouse = (install_mouse() >= 0) && !(getenv("GF_MOUSE") && !strcmp(getenv("GF_MOUSE"),"0")); }
 
   read_message_file(LANGUAGE);
   init_passwords();
@@ -532,10 +533,11 @@ void init_first()
 #endif
   
 
-  if (set_gfx_mode(GFX_AUTODETECT,XRES,YRES,0,0))
+  if (set_gfx_mode(GFX_AUTODETECT_WINDOWED,XRES,YRES,0,0))
   {
     error_exit(36,error_message[MSG_ERROR_GRAPHIC_INIT].text1,allegro_error,36,0);
   };
+  { extern int gf_mouse; if (gf_mouse) show_os_cursor(MOUSE_CURSOR_ARROW); }
 
 }
 

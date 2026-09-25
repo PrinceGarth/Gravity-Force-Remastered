@@ -100,7 +100,7 @@ void menu_draw_panel_text();
 //void init_stars();
 //void update_stars();
 //void draw_stars();
-void init_menu();
+void gf_init_menu();
 void exit_menu();
 void menu_main_init();
 void menu_splayer_init();
