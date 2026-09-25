@@ -424,6 +424,32 @@ static void menu_mouse(void)
       if (mx != lx || my != ly) actual_button = nr;
       if (b && !lb && actual_button == nr) { key[KEY_ENTER] = 1; injected = TRUE; }
     }
+
+  // click a "[nn]" level number in the mission / training high score box
+  if (b && !lb && (actual_menu == MNU_SPLAYER || actual_menu == MNU_SP_TRAINING))
+  {
+    int t = (actual_menu == MNU_SP_TRAINING);
+    int bx = t ? button[2].x + 79 : button[3].x + 15;   // same layout as the drawing code
+    int by = (t ? button[2].y : button[3].y) + 10;
+    int max = t ? cur_max_training_levels : cur_max_levels;
+    nr = (mx - bx) / 28 + 1;
+    if (mx >= bx && my >= by && my < by + text_height(impact10h) &&
+        (mx - bx) % 28 < text_length(impact10h, "[00]") && nr <= max)
+    {
+      if (t) current_training_level = nr;
+      else
+      {
+        current_level = nr;
+        CalcScoreString(score_str,
+                        hiscore_file.hiscore[current_level].nr[score_pos].name,
+                        hiscore_file.hiscore[current_level].nr[score_pos].score);
+      }
+      strcpy(button[0].text1, menu_message[t || config_file.config.level_available[nr] ?
+                                           MSG_MENU_PLAYLEVEL : MSG_MENU_UNLOCKLEVEL].text1);
+      actual_button = 0;
+      play_sound_sample(snd_click,1000,0,0,0,100);
+    }
+  }
   lx = mx; ly = my; lb = b;
 }
 
@@ -1296,7 +1322,13 @@ void menu_keymap_1p_init()
   button[14].textcol = col_white; button[14].font = impact14h;
   strcpy(button[14].text1,menu_message[MSG_KEY_2PLAYER].text1);
 
-  button_anz = 15;
+  // Linux port: mouse control on/off (Enter toggles, see do_menu_keymap_1p)
+  button[15] = button[12];
+  button[15].state = ST_OK;
+  button[15].y = 330;
+  strcpy(button[15].text1, LANGUAGE == 1 ? "Maus" : "Mouse");
+
+  button_anz = 16;
 
   change_title(mnu_t_spkeys);
 }
@@ -2150,6 +2182,9 @@ void draw_buttons()
                               col_green);
                     add_2_list(&rl,button[nr2].x+middle(640,text_length(impact10h,f))-38,375,text_length(impact10h,f),text_height(impact10h));
                   }
+                  jhtextout(vscreen,impact10h,
+                            menu_message[config_file.config.no_mouse ? MSG_MENU_OPT_OFF : MSG_MENU_OPT_ON].text1,
+                            button[15].x+120, button[15].y+8, col_green);
                   break;
 
      case MNU_KEYMAP_2P :
@@ -3632,7 +3667,8 @@ void do_menu_keymap_1p()
         if (actual_button == 6) actual_button = 13;
         else if (actual_button == 13) actual_button = 0;
         else if (actual_button == 14) actual_button = 7;
-        else if (actual_button == 12) actual_button = 14;
+        else if (actual_button == 12) actual_button = 15;
+        else if (actual_button == 15) actual_button = 14;
         else
         do
         {
@@ -3650,7 +3686,8 @@ void do_menu_keymap_1p()
     {
       if (!set_option)
       {
-        if (actual_button == 14) actual_button = 12;
+        if (actual_button == 14) actual_button = 15;
+        else if (actual_button == 15) actual_button = 12;
         else if (actual_button == 0) actual_button = 13;
         else if (actual_button == 13) actual_button = 6;
         else if (actual_button == 7) actual_button = 14;
@@ -3671,7 +3708,12 @@ void do_menu_keymap_1p()
     {
       if (button[actual_button].type == TP_NORMAL) button[actual_button].draw = FALSE;
 
-      if (button[actual_button].state == ST_PRESSED)
+      if (actual_button == 15)   // mouse on/off: toggle, no key to wait for
+      {
+        config_file.config.no_mouse = !config_file.config.no_mouse;
+        play_sound_sample(snd_menu_change,1000,0,0,0,100);
+      }
+      else if (button[actual_button].state == ST_PRESSED)
       {
         button[actual_button].state = ST_SELECTED;
         if (button[actual_button].type == TP_OPTIONS2) set_option = FALSE;
@@ -3707,7 +3749,7 @@ void do_menu_keymap_1p()
                       break;
           case  5  :  actual_button = 12;
                       break;
-          case  6  :  actual_button = 12;
+          case  6  :  actual_button = 15;
                       break;
           case  7  :  actual_button = 0;
                       break;
@@ -3724,6 +3766,8 @@ void do_menu_keymap_1p()
           case  13 :  actual_button = 14;
                       break;
           case  14 :  actual_button = 13;
+                      break;
+          case  15 :  actual_button = 6;
                       break;
         } // switch actual
       } // if set_option

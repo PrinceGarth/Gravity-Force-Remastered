@@ -258,7 +258,7 @@ static int mouse_ctrl(int c)
   static long armed[MAX_PLAYERS];
   float sx, sy, a;
 
-  if (!gf_mouse || game_mode == MP_2PDOGFIGHT || lock_kb) return 0;
+  if (!gf_mouse || config_file.config.no_mouse || game_mode == MP_2PDOGFIGHT || lock_kb) return 0;
   if (playship[c].land || playship[c].dead) { armed[c] = 0; return 1; }
   if (!armed[c]) { if (!(mouse_b & 2)) return 1; armed[c] = ms() + 500; }
   if (ms() < armed[c]) return 1;
@@ -267,8 +267,10 @@ static int mouse_ctrl(int c)
   sx = playship[c].xpos - map_x[1] - scroll_x[1] + PLAYSCREEN_XSTART + PLAYER_WIDTH/2.0;
   sy = playship[c].ypos - map_y[1] - scroll_y[1] + PLAYSCREEN_YSTART + (show_panel ? USCORE_HEIGHT : 0) + PLAYER_HEIGHT/2.0;
   a = atan2f(gf_mouse_x() - sx, sy - gf_mouse_y()) * 180.0 / M_PI;   // 0 = up, clockwise
-  if (a < 0) a += 360;
-  playship[c].head = a;
+  a = fmodf(a - playship[c].head + 540, 360) - 180;                    // shortest turn, -180..180
+  if (a >  TURN_SPEED) a =  TURN_SPEED;                                // same rate as keyboard
+  if (a < -TURN_SPEED) a = -TURN_SPEED;
+  playship[c].head = fmodf(playship[c].head + a + 360, 360);
   return 1;
 }
 

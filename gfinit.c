@@ -520,7 +520,7 @@ void init_first()
   allegro_init();
   install_timer();
   install_keyboard();
-  { extern int gf_mouse; gf_mouse = (install_mouse() >= 0) && !(getenv("GF_MOUSE") && !strcmp(getenv("GF_MOUSE"),"0")); }
+  { extern int gf_mouse; gf_mouse = (install_mouse() >= 0); }
 
   read_message_file(LANGUAGE);
   init_passwords();

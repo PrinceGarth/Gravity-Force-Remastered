@@ -69,7 +69,7 @@ typedef struct {
   int def_gravity;
   int p1weapons,p2weapons;
   int extras;
-  int user5,user6,user7,user8;
+  int no_mouse,user6,user7,user8;   // no_mouse: Linux port (was user5)
   char tuser1[10];
   char tuser2[50];
   char tuser3[30];
