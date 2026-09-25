@@ -410,20 +410,52 @@ void init_menu_sounds()
 static void menu_mouse(void)
 {
   extern int gf_mouse;
-  static int lx = -1, ly = -1, lb = 0, injected = FALSE;
+  static int lx = -1, ly = -1, lb = 0, inj_key = 0, inj_btn = -1, opt = FALSE, drag = -1;
   int nr, mx = gf_mouse_x(), my = gf_mouse_y(), b = mouse_b & 1;
 
-  if (injected) { key[KEY_ENTER] = 0; injected = FALSE; }
+  if (inj_key)
+  {
+    if (inj_key != KEY_ENTER)
+    {
+      set_option = opt;
+      if (actual_menu == MNU_OPTIONS && inj_btn == 0) { read_message_file(LANGUAGE); menu_options_init(); }
+    }
+    key[inj_key] = 0; inj_key = 0;
+  }
   if (lx < 0) { lx = gf_mouse_x(); ly = gf_mouse_y(); }   // resting cursor must not steal the selection
   if (!gf_mouse) return;
+  if (!b) drag = -1;
   for (nr = 0; nr < button_anz; nr++)
     if (button[nr].state != ST_DEACTIVATED &&
         mx >= button[nr].x && mx < button[nr].x + button[nr].w &&
         my >= button[nr].y && my < button[nr].y + button[nr].h)
     {
       if (mx != lx || my != ly) actual_button = nr;
-      if (b && !lb && actual_button == nr) { key[KEY_ENTER] = 1; injected = TRUE; }
+      if (b && !lb && actual_button == nr)
+      {
+        if (actual_menu == MNU_OPTIONS && (nr == 1 || nr == 2))
+        {
+          if (my >= button[nr].y + 30) drag = nr;         // grab the bar
+        }
+        else if (button[nr].type == TP_OPTIONS || (button[nr].type == TP_OPTIONS2 && actual_menu == MNU_QDOGFIGHT))
+        {
+          // option: left half = Left arrow, right half = Right arrow, as if editing it
+          inj_key = mx < button[nr].x + button[nr].w/2 ? KEY_LEFT : KEY_RIGHT;
+          opt = set_option; set_option = TRUE;
+        }
+        else inj_key = KEY_ENTER;
+        if (inj_key) { key[inj_key] = 1; inj_btn = nr; }
+      }
     }
+
+  // drag a bar: it spans x+10..x+210, 2 px per step (same as the drawing code)
+  if (drag > 0)
+  {
+    int v = (mx - button[drag].x - 10) / 2;
+    if (v < 0) v = 0;
+    if (v > 100) v = 100;
+    if (drag == 1) PIXEL_DIVISOR = v*2; else SOUND_VOLUME = v;
+  }
 
   // click a "[nn]" level number in the mission / training high score box
   if (b && !lb && (actual_menu == MNU_SPLAYER || actual_menu == MNU_SP_TRAINING))

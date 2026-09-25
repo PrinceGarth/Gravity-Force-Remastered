@@ -22,6 +22,8 @@ This file has two parts:
   - hovering selects a button;
   - clicking presses it;
   - clicking a level number selects that level on the Missions and Training screens.
+  - clicking an option's left or right half steps it down or up, like the arrow keys;
+  - the Pixel amount and Sound Volume bars can be clicked or dragged.
 - Menu music, played through libxmp.
 - Experimental scaled borderless fullscreen with `GF_SCALE=1`. Known bug: the screen can go blank after a keypress.
 
@@ -36,6 +38,7 @@ This file has two parts:
 ### Fixed
 - Enemies following a path, such as the orange orb in the test level, jumped back and forth. The cause was a name clash with glibc's `fmul`/`fsqrt`.
 - Craters from the big bomb acted as solid ground.
+- The in-game toggle keys (P panel, F debug readout, R radar zoom, and the cheat keys) flipped every frame while held, so a press landed on a random state. They now act once per press.
 - Typewriter messages at the start of a level showed as one long line, with the beginning hidden and `^` in place of line breaks. The language files mark line breaks with byte 0xF8, which the code didn't recognise.
 - Language switching:
   - text from the previous language stayed on screen;

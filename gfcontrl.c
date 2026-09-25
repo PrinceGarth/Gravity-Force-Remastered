@@ -79,6 +79,15 @@ static long ms(void)
   return ts.tv_sec*1000L + ts.tv_nsec/1000000;
 }
 
+// true once per key press (toggles must not flip every frame while held)
+static int tap(int k)
+{
+  static char held[KEY_MAX];
+  int t = key[k] && !held[k];
+  held[k] = key[k] ? 1 : 0;
+  return t;
+}
+
 int getctrl(int c, int reset)
 {
   static int j0up = FALSE, j0down = FALSE, j0left = FALSE, j0right = FALSE,
@@ -566,11 +575,10 @@ void read_keys(int c)
   }
 */
   // Radar verstellen
-  if ((key[KEY_R] || (demo_read_code & 2048)) && game_mode != MP_2PDOGFIGHT)
+  if ((tap(KEY_R) || (demo_read_code & 2048)) && game_mode != MP_2PDOGFIGHT)
   {
     radar_zoom--;
     if (radar_zoom < 1) radar_zoom = 5;
-    key[KEY_R] = 0;
     demo_write_code |= 2048;
   }
 
@@ -583,11 +591,11 @@ void read_keys(int c)
 //  if (USE_CHEATS) if ((key[KEY_ENTER] && !lock_kb) || (demo_read_code & 4096)) { playship[c].xspd = 0; playship[c].yspd = 0; clear_keybuf(); demo_write_code |= 4096; }
 //  if (key[KEY_D]) { show_normal_osd_message(impact10h,impact14h,"WELCOME TO","GRAVITY FORCE",15,col_yellow,col_white,1); clear_keybuf(); }
 //  if (key[KEY_E]) { show_typewriter_osd_message(impact10h,"WELCOME TO\nGRAVITY FORCE!\nJUST PLAY A BIT AND HAVE FUN!",60,5,col_orange,50); clear_keybuf(); }
-  if (key[KEY_P]) { if (show_panel) { show_panel = FALSE; clear(score_table); } else { show_panel = TRUE; draw_panel(); } clear_keybuf(); }
-  if (key[KEY_F]) { if (show_debug_info) {show_debug_info = FALSE; clear(score_table); draw_panel(); } else { show_debug_info = TRUE; clear(score_table); draw_panel_text(); } clear_keybuf(); }
+  if (tap(KEY_P)) { if (show_panel) { show_panel = FALSE; clear(score_table); } else { show_panel = TRUE; draw_panel(); } clear_keybuf(); }
+  if (tap(KEY_F)) { if (show_debug_info) {show_debug_info = FALSE; clear(score_table); draw_panel(); } else { show_debug_info = TRUE; clear(score_table); draw_panel_text(); } clear_keybuf(); }
 
 //  if (key[KEY_D]) { if (drop_points) { drop_points = FALSE; redraw = TRUE; } else { drop_points = TRUE; draw_splines(); } clear_keybuf(); }
-  if (USE_CHEATS) if (key[KEY_C]) { if (NO_CLIP) { NO_CLIP = FALSE; } else NO_CLIP = TRUE; clear_keybuf(); }
+  if (USE_CHEATS) if (tap(KEY_C)) { if (NO_CLIP) { NO_CLIP = FALSE; } else NO_CLIP = TRUE; clear_keybuf(); }
 
   if (key[KEY_F12]) save_screen = TRUE;
 
@@ -596,7 +604,7 @@ void read_keys(int c)
 //  if (key[KEY_G]) { fade_out_active = TRUE; fade_pos = 0; fade_opos = 0; fade_type = 2; fade_count = 0; fade_count_to = 150; fade_speed = 0.5; clear_keybuf(); }
 //  if (key[KEY_H]) { fade_out_active = TRUE; fade_pos = 0; fade_opos = 0; fade_type = 3; fade_count = 0; fade_count_to = 150; fade_speed = 0.5; clear_keybuf(); }
 
-  if (USE_CHEATS) if (key[KEY_U]) { level_end = END_GOOD; clear_keybuf(); }
+  if (USE_CHEATS) if (tap(KEY_U)) { level_end = END_GOOD; clear_keybuf(); }
 
 //  if (key[KEY_F5]) { make_levelmap(); }
 //  if (key[KEY_F8]) { generate_statistics(); }
