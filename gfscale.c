@@ -9,7 +9,7 @@
  *    Opt-in with GF_SCALE=1 (experimental); default is a plain 640x480 window.
  *    Windows: always a plain 640x480 window.
  *
- *    Also: run from the exe's directory, and the panic exit (Ctrl+C or the
+ *    Also: run from the exe's directory, and the panic exit (Ctrl+Shift+Q or the
  *    window's close button kills the game at once).
  */
 
@@ -60,7 +60,7 @@ static void panic(void)
 
 static void panic_key(int scancode)
 {
-  if (scancode == KEY_C && (key[KEY_LCONTROL] || key[KEY_RCONTROL])) panic();
+  if (scancode == KEY_Q && (key[KEY_LCONTROL] || key[KEY_RCONTROL]) && (key[KEY_LSHIFT] || key[KEY_RSHIFT])) panic();
 }
 
 static int with_panic(int ret)

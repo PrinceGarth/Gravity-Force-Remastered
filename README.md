@@ -28,7 +28,7 @@ Put `gf.exe` next to `dat/`. The game always runs in a window and never changes 
 
 ## Emergency exit
 
-Ctrl+C, or the window's close button, ends the game at once. Settings changed since the game started are not saved.
+Ctrl+Shift+Q, or the window's close button, ends the game at once. Settings changed since the game started are not saved.
 
 ## Controls
 
